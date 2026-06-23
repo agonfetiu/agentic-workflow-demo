@@ -708,7 +708,6 @@
       <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
       <span><span class="u-host" id="oUrlHost">jira.radix.com</span><span class="u-path" id="oUrlPath">/browse/EN-19042</span></span>
     </div>
-    <span class="daychip" id="dayChip">📅 Day <b id="oDay">1</b></span>
   </div>
 
   <div class="viewport" id="oViewport">
@@ -1627,12 +1626,6 @@
     $('#oViewport').appendChild(el); oNextEl=el;
   }
 
-  let day=1;
-  function advanceDay(n){
-    day=n; $('#oDay').textContent=n;
-    const c=$('#dayChip'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump');
-  }
-
   function typeInto(el,text,speed,cb){
     el.innerHTML='';
     const caret=document.createElement('span'); caret.className='caret'; el.appendChild(caret);
@@ -1670,15 +1663,15 @@
     const msgs=$('#slackMsgs');
     const txt=$('#slackField').textContent; $('#slackField').textContent=''; this.disabled=true;
     msgs.innerHTML+='<div class="tmsg"><div class="ta" style="background:#c2693c">AF</div><div class="tb"><div><b>Agon Fetiu</b><span class="tt">just now</span></div><div class="tbody">'+txt+'</div></div></div>';
-    const wait=document.createElement('div'); wait.className='tmsg'; wait.innerHTML='<div class="ta" style="background:#bbb"></div><div class="tb"><div class="tm-typing">Kyle is away — replied the next morning…</div></div>';
+    const wait=document.createElement('div'); wait.className='tmsg'; wait.innerHTML='<div class="ta" style="background:#bbb"></div><div class="tb"><div class="tm-typing">Kyle is typing…</div></div>';
     msgs.appendChild(wait); msgs.scrollTop=msgs.scrollHeight;
     setTimeout(()=>{
-      wait.remove(); advanceDay(2);
-      msgs.innerHTML+='<div class="tmsg"><div class="ta" style="background:#7c3aed">KC</div><div class="tb"><div><b>Kyle Campos</b><span class="tt">9:14 AM</span></div><div class="tbody">Use <b>benchmarkSelector</b> for the view state and stream via <b>toCsv()</b>. Filename should be <b>benchmark_{portfolio}_{date}.csv</b>. Just match how /reports already does it.</div></div></div>';
+      wait.remove();
+      msgs.innerHTML+='<div class="tmsg"><div class="ta" style="background:#7c3aed">KC</div><div class="tb"><div><b>Kyle Campos</b><span class="tt">just now</span></div><div class="tbody">Use <b>benchmarkSelector</b> for the view state and stream via <b>toCsv()</b>. Filename should be <b>benchmark_{portfolio}_{date}.csv</b>. Just match how /reports already does it.</div></div></div>';
       msgs.scrollTop=msgs.scrollHeight;
-      toast('green','Kyle replied (a day later)','You got guidance on Teams — now it only lives in this chat. Time to build.');
+      toast('green','Kyle replied','You got guidance on Teams — now it only lives in this chat. Time to build.');
       oNext('Next: build it (with Cursor)', 'code');
-    },3200);
+    },2600);
   });
 
   // STEP 4 — Cursor, ad-hoc & context-starved (the struggle)
@@ -1746,9 +1739,8 @@
     foot.innerHTML='<span class="wait-pill"><span class="spin"></span> Review requested — waiting on Kyle…</span>';
     oComment($('#oGhComments'),{who:'me',name:'agon-fetiu',text:'@kyle-campos could you take a look when you have time?'});
     setTimeout(()=>{
-      advanceDay(3);
       $('#oReviewBox').innerHTML='<div class="review-row"><span class="rdot req"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 6l12 12M18 6L6 18"/></svg></span><div><b>Kyle Campos requested changes</b> — changes must be addressed before merging.</div></div>';
-      oComment($('#oGhComments'),{who:'maya',name:'Kyle Campos',role:'reviewer',text:'A day late, sorry! One thing: please rename <code>toCsv</code> → <code>exportRows</code> for clarity, and add a test for the empty-filter case. Then I\'m happy.'});
+      oComment($('#oGhComments'),{who:'maya',name:'Kyle Campos',role:'reviewer',text:'One thing: please rename <code>toCsv</code> → <code>exportRows</code> for clarity, and add a test for the empty-filter case. Then I\'m happy.'});
       $('#oMergeFoot').innerHTML='<button class="btn-jira" id="oFixBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4z"/></svg> Go address the feedback</button><span class="fnote">Back to the editor, then push again…</span>';
       toast('gh','Changes requested','Kyle wants edits. Back to VS Code you go.');
       $('#oFixBtn').addEventListener('click',function(){
@@ -1756,7 +1748,6 @@
         $('#oMergeFoot').innerHTML='<span class="wait-pill"><span class="spin"></span> Pushed fixes — waiting on re-review…</span>';
         oComment($('#oGhComments'),{who:'me',name:'agon-fetiu',text:'Done — renamed the helper and added the empty-filter test. Pushed <code>a3f1c9e</code>.'});
         setTimeout(()=>{
-          advanceDay(4);
           $('#oReviewBox').innerHTML='<div class="review-row"><span class="rdot ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span><div><b>Kyle Campos approved these changes</b></div></div>';
           oComment($('#oGhComments'),{who:'maya',name:'Kyle Campos',role:'reviewer',text:'Perfect, thanks! Approved.'});
           const box=$('#oMergeBox'); box.querySelector('.merge-ic').className='merge-ic green';
@@ -1764,7 +1755,7 @@
           box.querySelector('.mt').textContent='This branch has no conflicts with the base branch';
           box.querySelector('.ms').textContent='1 approving review · you can merge now.';
           $('#oMergeFoot').innerHTML='<button class="btn-merge" id="oMergeBtn">Merge pull request</button><span class="fnote">Finally.</span>';
-          toast('green','Approved','Re-reviewed and approved — 4 days in. You can merge.');
+          toast('green','Approved','Re-reviewed and approved. You can merge.');
           bindOldMerge();
         },2600);
       });
@@ -1792,7 +1783,7 @@
           $('#oDoneBtn').addEventListener('click',function(){
             $('#oStatusBtn').classList.remove('prog'); $('#oStatusBtn').classList.add('done'); $('#oStatusText').textContent='Done';
             $('#oDoneCta').remove(); if(oNextEl){oNextEl.remove();oNextEl=null;}
-            oComment(ji,{who:'me',name:'Agon Fetiu',text:'Manually moved to <b>Done</b>. Shipped — about <b>4 days</b> end-to-end across 5 tools and 1 reviewer.'});
+            oComment(ji,{who:'me',name:'Agon Fetiu',text:'Manually moved to <b>Done</b>. Shipped — across 4 tools, a teammate, and a lot of context-switching.'});
             toast('green','EN-19042 → Done','Finally closed — by hand. Now compare with the Agentic tab. ☝️');
           });
         }
