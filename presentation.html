@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agentic Dispatch — The Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --jira-blue:#0c66e4; --jira-blue-h:#0055cc;
+    --jira-text:#172b4d; --jira-sub:#44546f; --jira-faint:#626f86;
+    --jira-border:#dfe1e6; --jira-hover:#f1f2f4;
+    --gh-green:#1f883d; --gh-link:#0969da; --gh-text:#1f2328; --gh-sub:#59636e;
+    --gh-border:#d1d9e0; --gh-canvas:#f6f8fa; --gh-header:#24292f; --gh-purple:#8250df;
+    --indigo:#4f46e5; --indigo-h:#4338ca;
+    --add:#e6ffec; --add-border:#a0f0b6;
+    --mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;
+    background:radial-gradient(1200px 700px at 50% -10%, #1c2447 0%, #0f1430 55%, #0a0e22 100%);
+    color:#eaefff; height:100%; overflow:hidden; -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column;
+  }
+
+  /* ---- top bar ---- */
+  .topbar{display:flex;align-items:center;gap:14px;padding:14px 24px;flex-shrink:0}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:15px;letter-spacing:-.01em}
+  .brand .dot{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#7c93ff,#4f46e5);display:grid;place-items:center;font-size:14px}
+  .brand small{font-weight:500;color:#9fb0e0;font-size:12.5px;margin-left:2px}
+  .topbar .spacer{flex:1}
+  .kv{font-size:12px;font-weight:700;color:#9fb0e0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);padding:6px 12px;border-radius:999px}
+
+  /* ---- deck / slides ---- */
+  .deck{flex:1;position:relative;min-height:0;padding:0 24px 18px}
+  .slide{position:absolute;inset:0 24px 18px;display:flex;flex-direction:column;gap:14px;
+         opacity:0;pointer-events:none;transform:translateY(14px) scale(.995);transition:opacity .5s ease, transform .5s cubic-bezier(.2,.9,.3,1)}
+  .slide.active{opacity:1;pointer-events:auto;transform:none}
+  .slide-head{flex-shrink:0}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#93a4d8}
+  .eyebrow .ph{background:rgba(124,147,255,.16);border:1px solid rgba(124,147,255,.4);color:#c3ccff;padding:3px 10px;border-radius:20px;letter-spacing:.08em}
+  .slide h1{font-size:28px;font-weight:800;letter-spacing:-.02em;margin-top:9px;line-height:1.15}
+  .slide h1 .accent{background:linear-gradient(90deg,#8ba2ff,#c3a0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .slide .lede{font-size:15px;color:#b9c5ea;margin-top:8px;max-width:900px;line-height:1.55}
+
+  .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:22px}
+
+  /* ---- browser frame ---- */
+  .frame{background:#fff;border-radius:13px;overflow:hidden;color:var(--jira-text);
+         box-shadow:0 40px 90px -30px rgba(0,0,0,.6), 0 8px 24px -6px rgba(0,0,0,.35);
+         border:1px solid rgba(0,0,0,.1);display:flex;flex-direction:column;max-height:100%}
+  .frame.w-lg{width:min(880px,60vw)} .frame.w-md{width:min(560px,44vw)} .frame.w-sm{width:min(440px,36vw)}
+  .fbar{height:38px;background:#eceef3;display:flex;align-items:center;gap:8px;padding:0 14px;flex-shrink:0;border-bottom:1px solid #dfe1e6}
+  .fbar i{width:11px;height:11px;border-radius:50%;display:block}
+  .fbar .u{margin-left:12px;font-size:12px;color:#5f6b85;background:#fff;border:1px solid #e2e5ea;border-radius:14px;padding:4px 12px;font-weight:500}
+  .fbar .u b{color:#172b4d;font-weight:600}
+  .fbody{padding:20px 22px;overflow:auto;background:#fff}
+  .fbody.dark{background:#0d1117;color:#e6edf3}
+
+  /* ---- jira panel (dispatch agent) ---- */
+  .jrow{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--jira-faint);font-weight:700;margin-bottom:5px}
+  .jkey{width:16px;height:16px;border-radius:4px;background:var(--jira-blue);display:grid;place-items:center;color:#fff;font-size:9px}
+  .jtitle{font-size:19px;font-weight:600;line-height:1.25;margin-bottom:14px}
+  .panel{border:1px solid var(--jira-border);border-radius:11px;overflow:hidden}
+  .panel-h{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700;color:var(--jira-text);padding:13px 15px;border-bottom:1px solid var(--jira-border)}
+  .panel-h .gi{width:20px;height:20px}
+  .panel-b{padding:14px 15px;font-size:13.5px;color:var(--jira-sub);line-height:1.5}
+  .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--jira-faint);margin:10px 0 6px}
+  .msel{border:1px solid var(--jira-border);border-radius:8px;padding:8px 10px;display:flex;flex-wrap:wrap;gap:7px;min-height:40px;align-items:center}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;font-family:var(--mono);background:#e9f2ff;color:#0055cc;border:1px solid #cfe0f5;padding:4px 9px;border-radius:7px}
+  .chip .x{opacity:.5}
+  .selrow{display:flex;align-items:center;gap:10px;margin-top:14px}
+  .drop{flex-shrink:0;width:150px;border:1px solid var(--jira-border);border-radius:8px;padding:9px 12px;font-size:13.5px;display:flex;align-items:center;justify-content:space-between;color:var(--jira-text);font-weight:500}
+  .btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--jira-blue);color:#fff;border:none;font-size:14px;font-weight:600;padding:10px 18px;border-radius:8px;box-shadow:0 1px 2px rgba(12,102,228,.4)}
+  .btn-dark{background:#0b0b0f;color:#fff}
+  .statusrow{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+  .strow{display:flex;align-items:center;gap:9px;font-size:13px}
+  .loz{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:2px 8px;border-radius:20px}
+  .loz.ok{background:#dcfff1;color:#216e4e} .loz.run{background:#e9f2ff;color:#0055cc} .loz.wait{background:#fff3d6;color:#8a6d1a}
+  .strow .rname{font-family:var(--mono);font-size:12.5px;color:var(--jira-text)}
+  .strow a{color:var(--gh-link);text-decoration:none;font-size:12.5px;margin-left:auto}
+  .banner{display:flex;align-items:flex-start;gap:11px;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5}
+  .banner.ok{background:#dcfff1;border:1px solid #a6f0cf;color:#216e4e}
+  .banner b{display:block;color:#164b35;font-size:13.5px;margin-bottom:2px}
+
+  /* ---- github ---- */
+  .ghhead{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--gh-text);margin-bottom:14px}
+  .ghhead a{color:var(--gh-link);text-decoration:none;font-weight:600}
+  .ghhead .sep{color:var(--gh-sub)} .ghhead .priv{font-size:11px;border:1px solid var(--gh-border);color:var(--gh-sub);padding:1px 8px;border-radius:20px;font-weight:600}
+  .runbox{border:1px solid var(--gh-border);border-radius:10px;overflow:hidden}
+  .runtop{display:flex;align-items:center;gap:11px;padding:13px 15px;border-bottom:1px solid var(--gh-border);background:var(--gh-canvas)}
+  .runtop .rt{font-weight:600;font-size:14px;color:var(--gh-text)} .runtop .rs{font-size:12.5px;color:var(--gh-sub)}
+  .step{display:flex;align-items:center;gap:11px;padding:10px 15px;font-size:13px;color:var(--gh-sub)}
+  .step:not(:last-child){border-bottom:1px solid #eaeef2}
+  .step b{color:var(--gh-text);font-weight:500}
+  .dotok{width:18px;height:18px;border-radius:50%;background:var(--gh-green);color:#fff;display:grid;place-items:center;flex-shrink:0}
+  .dotok svg{width:11px;height:11px}
+  .dotrun{width:16px;height:16px;border:2px solid #b3d4ff;border-top-color:var(--jira-blue);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .step .pill{margin-left:auto;font-size:12px;font-family:var(--mono);color:var(--gh-sub)}
+
+  .prtitle{font-size:20px;font-weight:400;color:var(--gh-text);line-height:1.3;margin-bottom:11px}
+  .prtitle .n{color:var(--gh-sub)}
+  .prmeta{display:flex;align-items:center;gap:11px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--gh-border)}
+  .prstate{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#fff;background:var(--gh-green);padding:6px 13px;border-radius:20px}
+  .prstate.merged{background:var(--gh-purple)} .prstate svg{width:15px;height:15px}
+  .prmeta .sub{font-size:13px;color:var(--gh-sub)} .prmeta .sub b{color:var(--gh-text)}
+  .br{font-family:var(--mono);font-size:12px;background:#ddf4ff;color:#0969da;padding:2px 8px;border-radius:20px;font-weight:500}
+  .ghlabel{font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
+  .ghlabel.spec{background:#ddf4ff;color:#0969da;border:1px solid #b6e3ff}
+  .ghlabel.impl{background:#dafbe1;color:#116329;border:1px solid #aceebb}
+  .filebox{border:1px solid var(--gh-border);border-radius:8px;overflow:hidden;margin-top:6px}
+  .filehead{background:var(--gh-canvas);padding:8px 14px;border-bottom:1px solid var(--gh-border);font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--gh-text);display:flex;gap:9px;align-items:center}
+  .filehead .stat{margin-left:auto;font-size:11.5px}.filehead .stat .a{color:var(--gh-green);font-weight:600}
+  .diff{font-family:var(--mono);font-size:12px;line-height:1.85;padding:8px 0}
+  .dl{display:flex;white-space:pre}.dl .ln{width:34px;text-align:right;padding-right:10px;color:#6e7781;opacity:.7;flex-shrink:0}
+  .dl.add{background:var(--add)}.dl.add .ln{background:#ccffd8}.dl .g{width:16px;text-align:center;color:#1a7f37;flex-shrink:0}
+  .tokh{color:#0550ae;font-weight:600}.tokk{color:#cf222e}.toks{color:#0a3069}
+  .checks{border:1px solid var(--gh-border);border-radius:8px;overflow:hidden;margin-top:12px}
+  .checktop{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--gh-border)}
+  .checktop .ci{width:24px;height:24px;border-radius:50%;background:var(--gh-green);color:#fff;display:grid;place-items:center}.checktop .ci svg{width:14px}
+  .checktop b{font-size:14px}.checktop span{font-size:12.5px;color:var(--gh-sub)}
+  .mergebox{border:1px solid var(--gh-border);border-radius:8px;overflow:hidden;margin-top:10px}
+  .mergefoot{background:var(--gh-canvas);padding:14px 16px;display:flex;align-items:center;gap:12px}
+  .btn-merge{background:var(--gh-purple);color:#fff;border:none;font-size:13.5px;font-weight:600;padding:8px 16px;border-radius:7px}
+  .mergefoot .fn{font-size:12.5px;color:var(--gh-sub)}
+
+  /* ---- cursor agent card ---- */
+  .cursor{background:#161616;border:1px solid #000;color:#d4d4d4}
+  .cchrome{height:38px;background:#232323;display:flex;align-items:center;gap:8px;padding:0 14px;font-size:12.5px;color:#fff;font-weight:700}
+  .cchrome .cd{width:18px;height:18px;border-radius:5px;background:#0b0b0f;border:1px solid #3a3a3a;display:grid;place-items:center;font-size:11px}
+  .cctx{padding:8px 15px;background:#1d1d1d;border-bottom:1px solid #2c2c2c;font-family:var(--mono);font-size:11.5px;color:#8fa0c0}
+  .cmsg{display:flex;gap:10px;padding:14px 15px}
+  .cav{width:26px;height:26px;border-radius:7px;background:#0b0b0f;border:1px solid #3a3a3a;display:grid;place-items:center;flex-shrink:0}
+  .cbody .cn{font-size:12px;font-weight:700;color:#eaeaea;margin-bottom:5px}
+  .cbody .ct{font-size:13px;color:#c4c9d2;line-height:1.6}
+  .cwork{margin:12px 15px 0;border:1px solid #2c2c2c;border-radius:9px;background:#1b1b1b;overflow:hidden}
+  .cw{display:flex;align-items:center;gap:10px;padding:9px 12px;font-size:12.5px;color:#b7bdca}
+  .cw:not(:last-child){border-bottom:1px solid #262626}
+  .cw .wok{width:16px;height:16px;border-radius:50%;background:#15301d;color:#3fb950;display:grid;place-items:center}.cw .wok svg{width:10px}
+  .cw .wrun{width:14px;height:14px;border:2px solid #2a3f66;border-top-color:#7c93ff;border-radius:50%;animation:spin .8s linear infinite}
+
+  /* ---- comments (jira write-back) ---- */
+  .cmt{display:flex;gap:11px;margin-bottom:15px}
+  .cmt .ca{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+  .cmt .ca.bot{background:#0b0b0f}.cmt .ca.me{background:#c2693c}
+  .cmt .ch{display:flex;align-items:center;gap:8px;margin-bottom:4px}.cmt .ch b{font-size:13px;color:var(--jira-text)}
+  .cmt .ch .bt{font-size:9px;font-weight:800;background:#eae6ff;color:#5e4db2;padding:2px 6px;border-radius:4px;text-transform:uppercase}
+  .cmt .ch .tm{font-size:11.5px;color:var(--jira-faint)}
+  .cmt .cx{font-size:13px;color:var(--jira-sub);line-height:1.55}
+  .cmt .cx a{color:var(--gh-link);text-decoration:none}
+
+  /* ---- arch diagram ---- */
+  .arch{display:flex;align-items:stretch;justify-content:center;gap:0;width:min(1000px,80vw)}
+  .node{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:18px 16px;text-align:center}
+  .node .ni{width:44px;height:44px;border-radius:12px;margin:0 auto 11px;display:grid;place-items:center;font-size:22px}
+  .node h3{font-size:15px;font-weight:700;margin-bottom:6px}
+  .node p{font-size:12.5px;color:#b3c0e6;line-height:1.5}
+  .arrowcol{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 6px;flex-shrink:0}
+  .arrowcol .lab{font-size:10px;font-weight:700;color:#8ba2ff;font-family:var(--mono);white-space:nowrap;margin-bottom:5px}
+  .arrowcol .ar{font-size:22px;color:#5b6b9a}
+
+  .cap{flex-shrink:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:13px 17px;display:flex;align-items:center;gap:13px}
+  .cap .cnum{width:26px;height:26px;border-radius:8px;background:rgba(124,147,255,.2);color:#c3ccff;display:grid;place-items:center;font-weight:800;font-size:13px;flex-shrink:0}
+  .cap p{font-size:13.5px;color:#cdd7f5;line-height:1.5}
+  .cap b{color:#fff}
+  .cap code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.09);padding:2px 7px;border-radius:5px;color:#dfe6ff}
+
+  /* ---- nav ---- */
+  .nav{display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 24px 18px;flex-shrink:0}
+  .arrow{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#e6edff;
+         display:grid;place-items:center;cursor:pointer;transition:.15s}
+  .arrow:hover{background:rgba(124,147,255,.28);transform:translateY(-1px)}
+  .arrow:disabled{opacity:.3;cursor:default;transform:none}
+  .arrow svg{width:20px;height:20px}
+  .dots{display:flex;align-items:center;gap:8px}
+  .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.22);cursor:pointer;transition:.15s}
+  .dot.on{background:#8ba2ff;transform:scale(1.25);box-shadow:0 0 0 4px rgba(139,162,255,.18)}
+  .counter{font-size:12.5px;font-weight:700;color:#9fb0e0;font-variant-numeric:tabular-nums;min-width:54px;text-align:center}
+  .hint{position:fixed;bottom:16px;right:20px;font-size:11.5px;color:#7c88ad}
+  .kbd{font-family:var(--mono);font-size:10.5px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:5px;padding:2px 6px;color:#b9c5ea}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><span class="dot">⚡</span> Agentic Dispatch <small>· GitHub-orchestrated agent flow</small></div>
+    <div class="spacer"></div>
+    <div class="kv">Jira triggers · GitHub runs · Cursor builds</div>
+  </div>
+
+  <div class="deck" id="deck">
+
+    <!-- 1 — TITLE -->
+    <section class="slide active">
+      <div class="slide-head">
+        <span class="eyebrow">Radix · Engineering</span>
+        <h1>One click on a ticket → <span class="accent">agents build it across every repo</span></h1>
+        <p class="lede">A human clicks <b>Dispatch Agent</b> on a Jira ticket. From there GitHub owns the whole flow — triage, spec, review gate, implementation — running Cursor cloud agents and reporting back to the ticket. No PAT, no Jira automations doing the build.</p>
+      </div>
+      <div class="stage">
+        <div class="arch">
+          <div class="node"><div class="ni" style="background:#e9f2ff">🎫</div><h3>Jira</h3><p>Human intent + the Dispatch button. Receives status updates.</p></div>
+          <div class="arrowcol"><span class="lab">repository_dispatch</span><span class="ar">→</span></div>
+          <div class="node"><div class="ni" style="background:#2b2f38">🐙</div><h3>GitHub</h3><p>Orchestrates the flow: Actions + a GitHub App that opens PRs.</p></div>
+          <div class="arrowcol"><span class="lab">/v1/agents</span><span class="ar">→</span></div>
+          <div class="node"><div class="ni" style="background:#111">▮</div><h3>Cursor</h3><p>Cloud agents write the spec &amp; the code, one per repo.</p></div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">1</span><p>The big idea: <b>GitHub is the orchestrator</b>; Jira is the human trigger and the tracking surface. Everything below happens automatically once someone hits Dispatch.</p></div>
+    </section>
+
+    <!-- 2 — DISPATCH PANEL -->
+    <section class="slide">
+      <div class="slide-head"><span class="eyebrow"><span class="ph">Phase 1</span> Product intent</span>
+        <h1>The <span class="accent">Dispatch Agent</span> button, right on the ticket</h1></div>
+      <div class="stage">
+        <div class="frame w-md">
+          <div class="fbar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="u">radixinc.atlassian.net<b>/browse/EN-1420</b></span></div>
+          <div class="fbody">
+            <div class="jrow"><span class="jkey">✓</span> EN-1420</div>
+            <div class="jtitle">Add portfolio export to PDF</div>
+            <div class="panel">
+              <div class="panel-h"><span class="gi">⚡</span> Dispatch Agent</div>
+              <div class="panel-b">
+                Launch Cursor cloud agents for this ticket through the GitHub agentic flow.
+                <div class="lbl">Repositories</div>
+                <div class="msel"><span class="chip">RadixInc/radix-platform <span class="x">✕</span></span><span class="chip">RadixInc/survey-app-frontend <span class="x">✕</span></span></div>
+                <div class="selrow">
+                  <div class="drop">auto <span style="opacity:.5">▾</span></div>
+                  <button class="btn-primary" style="flex:1;justify-content:center">Dispatch</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">2</span><p>A Forge app adds the panel to the issue. The engineer picks <b>which repos</b> (a dynamic list — repos tagged <code>agentic-dispatch</code>) and a <b>mode</b> (<code>auto</code> / <code>force-spec</code> / <code>no-spec</code>), then clicks Dispatch once the ticket is ready.</p></div>
+    </section>
+
+    <!-- 3 — DISPATCH FIRES -->
+    <section class="slide">
+      <div class="slide-head"><span class="eyebrow"><span class="ph">Phase 1 → 2</span> The handoff</span>
+        <h1>Jira fires a <span class="accent">repository_dispatch</span> — no PAT</h1></div>
+      <div class="stage">
+        <div class="arch" style="width:min(860px,70vw)">
+          <div class="node"><div class="ni" style="background:#e9f2ff">⚡</div><h3>Forge app</h3><p>Holds the GitHub App key in Forge secure storage. Mints a short-lived installation token.</p></div>
+          <div class="arrowcol"><span class="lab">POST /dispatches</span><span class="ar">→</span></div>
+          <div class="node"><div class="ni" style="background:#2b2f38">🐙</div><h3>repository_dispatch</h3><p>One event per selected repo, carrying the ticket key, mode, and the sibling repos.</p></div>
+          <div class="arrowcol"><span class="lab">on:</span><span class="ar">→</span></div>
+          <div class="node"><div class="ni" style="background:#eef2ff">▶</div><h3>Actions</h3><p>Each repo's <code>dispatch-agent</code> workflow wakes up.</p></div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">3</span><p>Authentication is a <b>GitHub App</b>, not a personal token — nothing expires, it's org-controlled, and every action is auditable as the app. Jira never touches the build; it just posts one webhook.</p></div>
+    </section>
+
+    <!-- 4 — GITHUB ACTIONS RUN -->
+    <section class="slide">
+      <div class="slide-head"><span class="eyebrow"><span class="ph">Phase 2</span> Triage — GitHub</span>
+        <h1>GitHub <span class="accent">validates, dedups, and launches</span></h1></div>
+      <div class="stage">
+        <div class="frame w-lg">
+          <div class="fbar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="u">github.com<b>/RadixInc/radix-platform/actions</b></span></div>
+          <div class="fbody">
+            <div class="ghhead">🐙 <a>Dispatch EN-1420 · auto</a></div>
+            <div class="runbox">
+              <div class="runtop"><span class="dotok"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 011.06 0z"/></svg></span><div><div class="rt">launch-triage-agent</div><div class="rs">succeeded in 1m 42s</div></div></div>
+              <div class="step"><span class="dotok"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 011.06 0z"/></svg></span><b>Validate + resolve inputs</b><span class="pill">ticket EN-1420</span></div>
+              <div class="step"><span class="dotok"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 011.06 0z"/></svg></span><b>Skip if already running</b><span class="pill">no duplicate</span></div>
+              <div class="step"><span class="dotok"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 011.06 0z"/></svg></span><b>Mint GitHub App token</b><span class="pill">fail-fast</span></div>
+              <div class="step"><span class="dotok"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 011.06 0z"/></svg></span><b>Launch Cursor cloud agent</b><span class="pill">HTTP 201</span></div>
+              <div class="step"><span class="dotrun"></span><b>Wait for agent to finish</b><span class="pill">following…</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">4</span><p>The workflow guards against <b>duplicate dispatches</b>, mints the app token <b>first</b> (a bad key fails in seconds, not after a wasted run), launches the agent, then <b>follows the run live</b> so progress shows right in GitHub.</p></div>
+    </section>
+
+    <!-- 5 — CURSOR TRIAGE AGENT -->
+    <section class="slide">
+      <div class="slide-head"><span class="eyebrow"><span class="ph">Phase 2</span> The agent</span>
+        <h1>A Cursor cloud agent writes <span class="accent">the spec</span></h1></div>
+      <div class="stage">
+        <div class="frame w-md cursor">
+          <div class="cchrome"><span class="cd">▮</span> Triage EN-1420 · cloud</div>
+          <div class="cctx">radix-platform · reading AGENTS.md → scope: this repo only</div>
+          <div class="cmsg"><span class="cav">▮</span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">This ticket spans two repos. I own the <b>radix-platform</b> slice — the export API. The frontend button is out of scope (survey-app-frontend handles it).</div>
+            <div class="cwork">
+              <div class="cw"><span class="wok"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 011.06 0z"/></svg></span> Read AGENTS.md — Mission &amp; Scope</div>
+              <div class="cw"><span class="wok"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 011.06 0z"/></svg></span> Write specs/EN-1420/spec.md (EARS ACs)</div>
+              <div class="cw"><span class="wrun"></span> Open spec PR — ready for review</div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">5</span><p>The prompt defers to <b>AGENTS.md</b> and scopes the agent to <b>only this repo's part</b> of the ticket. In <code>force-spec</code>/<code>auto</code> it writes an EARS spec at <code>specs/&lt;KEY&gt;/spec.md</code> and stops — it does not implement yet.</p></div>
+    </section>
+
+    <!-- 6 — SPEC PR -->
+    <section class="slide">
+      <div class="slide-head"><span class="eyebrow"><span class="ph">Phase 3</span> Human review</span>
+        <h1>A <span class="accent">spec PR</span> opens — with CI and labels</h1></div>
+      <div class="stage">
+        <div class="frame w-lg">
+          <div class="fbar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="u">github.com<b>/RadixInc/radix-platform/pull/842</b></span></div>
+          <div class="fbody">
+            <div class="prtitle">EN-1420 SPEC: portfolio PDF export <span class="n">#842</span></div>
+            <div class="prmeta"><span class="prstate"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3.25a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25z"/></svg> Open</span><span class="span"></span><span class="br">EN-1420/spec</span> <span class="ghlabel spec">spec</span></div>
+            <div class="filebox">
+              <div class="filehead">specs/EN-1420/spec.md <span class="stat"><span class="a">+58</span></span></div>
+              <div class="diff">
+                <div class="dl add"><span class="ln">1</span><span class="g">+</span><span class="tokh"># EN-1420 — Portfolio PDF export (radix-platform slice)</span></div>
+                <div class="dl add"><span class="ln">2</span><span class="g">+</span></div>
+                <div class="dl add"><span class="ln">3</span><span class="g">+</span>## Acceptance Criteria</div>
+                <div class="dl add"><span class="ln">4</span><span class="g">+</span><span class="toks">- **AC-1**: GET /portfolio/:id/export returns a PDF (200).</span></div>
+                <div class="dl add"><span class="ln">5</span><span class="g">+</span><span class="toks">- **AC-2**: Out of scope — the UI button (survey-app-frontend).</span></div>
+              </div>
+            </div>
+            <div class="checks">
+              <div class="checktop"><span class="ci"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 011.06 0z"/></svg></span><b>All checks have passed</b> <span>· spec-traceability, Label PRs</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">6</span><p>Because the PR is opened <b>as the GitHub App</b> (not the Actions bot), CI, the <code>spec-traceability</code> gate, and the <code>spec</code> labeler all fire — exactly as they would for a human PR. A person reviews the spec.</p></div>
+    </section>
+
+    <!-- 7 — MERGE = GREEN LIGHT -->
+    <section class="slide">
+      <div class="slide-head"><span class="eyebrow"><span class="ph">Phase 3 → 4</span> The green light</span>
+        <h1>Merging the spec PR is <span class="accent">the go-ahead</span></h1></div>
+      <div class="stage">
+        <div class="frame w-lg">
+          <div class="fbar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="u">github.com<b>/RadixInc/radix-platform/pull/842</b></span></div>
+          <div class="fbody">
+            <div class="prtitle">EN-1420 SPEC: portfolio PDF export <span class="n">#842</span></div>
+            <div class="prmeta"><span class="prstate merged"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M5 3.254V3.25v.005a.75.75 0 110-.005v.004zm.45 1.9a2.25 2.25 0 10-1.95.218v5.256a2.25 2.25 0 101.5 0V7.123A5.735 5.735 0 009.25 9h1.378a2.251 2.251 0 100-1.5H9.25a4.25 4.25 0 01-3.8-2.346zM12.75 9a.75.75 0 100-1.5.75.75 0 000 1.5z"/></svg> Merged</span><span class="br">EN-1420/spec</span></div>
+            <div class="mergebox">
+              <div class="mergefoot"><button class="btn-merge">✓ Merged by Agon Fetiu</button><span class="fn">The spec is now on <b>main</b> — this triggers implementation automatically.</span></div>
+            </div>
+            <div class="banner ok" style="margin-top:14px"><span>🔔</span><div><b>Native webhook: pull_request.closed (merged, head = */spec)</b>The <code>implement-on-spec-merge</code> workflow fires — 100% GitHub-native, no Jira involved.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">7</span><p>A human merges the spec PR when it's right. That merge — a <b>merged PR whose branch ends in <code>/spec</code></b> — is the signal that kicks off implementation. Loop-safe: implementation branches don't end in <code>/spec</code>, so they never re-trigger.</p></div>
+    </section>
+
+    <!-- 8 — IMPLEMENT ON MERGE -->
+    <section class="slide">
+      <div class="slide-head"><span class="eyebrow"><span class="ph">Phase 4</span> Implementation</span>
+        <h1>The <span class="accent">implementation agent</span> opens a code PR</h1></div>
+      <div class="stage">
+        <div class="frame w-lg">
+          <div class="fbar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="u">github.com<b>/RadixInc/radix-platform/pull/843</b></span></div>
+          <div class="fbody">
+            <div class="prtitle">EN-1420: implement portfolio PDF export <span class="n">#843</span></div>
+            <div class="prmeta"><span class="prstate"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3.25a2.25 2.25 0 113 2.122v5.256a2.251 2.251 0 11-1.5 0V5.372A2.25 2.25 0 011.5 3.25z"/></svg> Open</span><span class="br">EN-1420/pdf-export</span> <span class="ghlabel impl">impl</span></div>
+            <div class="filebox">
+              <div class="filehead">apps/api/src/portfolio/export.controller.ts <span class="stat"><span class="a">+96</span></span></div>
+              <div class="diff">
+                <div class="dl add"><span class="ln">1</span><span class="g">+</span><span class="tokk">@Get</span>(<span class="toks">':id/export'</span>)</div>
+                <div class="dl add"><span class="ln">2</span><span class="g">+</span><span class="tokk">async</span> exportPdf(@Param(<span class="toks">'id'</span>) id: string) {</div>
+                <div class="dl add"><span class="ln">3</span><span class="g">+</span>  <span class="tokk">return</span> this.export.toPdf(id);</div>
+                <div class="dl add"><span class="ln">4</span><span class="g">+</span>}</div>
+              </div>
+            </div>
+            <div class="checks">
+              <div class="checktop"><span class="ci"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 011.06 0z"/></svg></span><b>CI · unit tests · spec-traceability</b> <span>· all green</span></div>
+              <div class="step" style="border-top:1px solid #eaeef2"><span class="dotok"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06l2.72 2.72 6.72-6.72a.75.75 0 011.06 0z"/></svg></span><b>Every AC-n covered by a tagged test</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">8</span><p>A fresh Cursor agent reads the approved spec, works TDD (one failing test per acceptance criterion), and opens the implementation PR. CI and the traceability gate run on the code. A human reviews and merges.</p></div>
+    </section>
+
+    <!-- 9 — MULTI-REPO -->
+    <section class="slide">
+      <div class="slide-head"><span class="eyebrow">Multi-repo</span>
+        <h1>One ticket, <span class="accent">many repos</span> — tracked in one place</h1></div>
+      <div class="stage">
+        <div class="frame w-md">
+          <div class="fbar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="u">radixinc.atlassian.net<b>/browse/EN-1420</b></span></div>
+          <div class="fbody">
+            <div class="jrow"><span class="jkey">✓</span> EN-1420</div>
+            <div class="jtitle">Add portfolio export to PDF</div>
+            <div class="panel">
+              <div class="panel-h"><span class="gi">⚡</span> Dispatch Agent</div>
+              <div class="panel-b">
+                <div class="banner ok"><span>✅</span><div><b>Dispatched · mode auto</b>Two agents launched — each handling its own slice.</div></div>
+                <div class="statusrow" style="margin-top:12px">
+                  <div class="strow"><span class="loz ok">dispatched</span><span class="rname">RadixInc/radix-platform</span><a>Actions →</a></div>
+                  <div class="strow"><span class="loz ok">dispatched</span><span class="rname">RadixInc/survey-app-frontend</span><a>Actions →</a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">9</span><p>Select several repos and the button <b>fans out</b> — a separate agent per repo, each told to handle only its slice and to defer the others' parts. The panel shows a <b>status row per repo</b>, so a dev tracks the whole feature from the ticket.</p></div>
+    </section>
+
+    <!-- 10 — JIRA WRITE-BACK -->
+    <section class="slide">
+      <div class="slide-head"><span class="eyebrow"><span class="ph">Phase 5</span> Back to the ticket</span>
+        <h1>GitHub <span class="accent">reports back</span> to Jira</h1></div>
+      <div class="stage">
+        <div class="frame w-md">
+          <div class="fbar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span class="u">radixinc.atlassian.net<b>/browse/EN-1420</b></span></div>
+          <div class="fbody">
+            <div class="sec-label" style="font-size:13px;font-weight:700;margin-bottom:14px">Activity</div>
+            <div class="cmt"><span class="ca bot">▮</span><div><div class="ch"><b>Dispatch Agent</b><span class="bt">bot</span><span class="tm">2m ago</span></div><div class="cx">🤖 Triage agent launched in <b>radix-platform</b>.<br><a>Follow in GitHub Actions →</a></div></div></div>
+            <div class="cmt"><span class="ca bot">▮</span><div><div class="ch"><b>Dispatch Agent</b><span class="bt">bot</span><span class="tm">just now</span></div><div class="cx">✅ Triage agent finished for EN-1420 in radix-platform. Spec PR <a>#842</a> is ready for review.</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">10</span><p>The workflow comments launch and completion status back onto the ticket — <b>Jira stays the tracking surface</b> without ever driving the build. Dispatch failures and agent errors surface the same way.</p></div>
+    </section>
+
+    <!-- 11 — RECAP -->
+    <section class="slide">
+      <div class="slide-head"><span class="eyebrow">The whole loop</span>
+        <h1>Version-controlled orchestration, <span class="accent">rolled out by a kit</span></h1></div>
+      <div class="stage" style="flex-direction:column;gap:20px">
+        <div class="arch" style="width:min(1040px,84vw)">
+          <div class="node"><div class="ni" style="background:#e9f2ff">🎫</div><h3>Dispatch</h3><p>Forge panel · pick repos + mode</p></div>
+          <div class="arrowcol"><span class="ar">→</span></div>
+          <div class="node"><div class="ni" style="background:#eef2ff">🔎</div><h3>Triage</h3><p>agent → spec PR (per repo)</p></div>
+          <div class="arrowcol"><span class="ar">→</span></div>
+          <div class="node"><div class="ni" style="background:#f3ecff">✅</div><h3>Merge</h3><p>human green-light</p></div>
+          <div class="arrowcol"><span class="ar">→</span></div>
+          <div class="node"><div class="ni" style="background:#dafbe1">🛠️</div><h3>Implement</h3><p>agent → code PR + CI</p></div>
+          <div class="arrowcol"><span class="ar">→</span></div>
+          <div class="node"><div class="ni" style="background:#fff3d6">👀</div><h3>Review</h3><p>human merges · Jira updated</p></div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+          <div class="kv">3 workflows in every repo</div>
+          <div class="kv">GitHub App auth — no PAT</div>
+          <div class="kv">agentic-standards-kit v1.4.0</div>
+          <div class="kv">live in 5 repos</div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">11</span><p>The whole flow is <b>code in each repo</b> (three workflows, synced from the kit) — reviewable, testable, composable. Add a repo by syncing the kit, tagging it <code>agentic-dispatch</code>, and it shows up in the panel. <b>That's the flow.</b></p></div>
+    </section>
+
+  </div>
+
+  <div class="nav">
+    <button class="arrow" id="prev" aria-label="Previous">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="dots" id="dots"></div>
+    <span class="counter" id="counter">1 / 11</span>
+    <button class="arrow" id="next" aria-label="Next">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+  <div class="hint">Use <span class="kbd">←</span> <span class="kbd">→</span> or the arrows</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const counter = document.getElementById('counter');
+  const dotsWrap = document.getElementById('dots');
+  let i = 0;
+
+  slides.forEach((_, n) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (n === 0 ? ' on' : '');
+    d.addEventListener('click', () => go(n));
+    dotsWrap.appendChild(d);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    dots.forEach((d, k) => d.classList.toggle('on', k === i));
+    counter.textContent = (i + 1) + ' / ' + slides.length;
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+  }
+  prev.addEventListener('click', () => go(i - 1));
+  next.addEventListener('click', () => go(i + 1));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(slides.length - 1);
+  });
+  go(0);
+</script>
+</body>
+</html>
