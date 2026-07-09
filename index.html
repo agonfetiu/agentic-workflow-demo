@@ -818,6 +818,14 @@
   @keyframes swHide{to{opacity:0;width:0;margin-right:-10px;overflow:hidden}}
   @keyframes swShow{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
 
+
+  /* ---- minimal actions run ---- */
+  .runmini{border:1px solid #d1d9e0;border-radius:10px;overflow:hidden;background:#fff;max-width:560px}
+  .rrow{display:flex;align-items:center;gap:11px;padding:12px 15px;font-size:13px;color:#44546f}
+  .rrow:not(:last-child){border-bottom:1px solid #eaeef2}
+  .rok{width:19px;height:19px;border-radius:50%;background:#1f883d;color:#fff;display:grid;place-items:center;flex-shrink:0}
+  .rok svg{width:11px;height:11px}
+  .rrun{width:15px;height:15px;border:2px solid #b3d4ff;border-top-color:#0c66e4;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
   /* ---- sequence diagram overlay ---- */
   .diagram{position:fixed;inset:0;background:rgba(18,26,46,.6);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
   .diagram.open{display:flex}
@@ -1004,6 +1012,23 @@
       </div>
     </div>
 
+
+    <!-- GITHUB . ACTIONS (minimal) -->
+    <div class="view" id="viewActions">
+      <div class="mini-app">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="#24292f"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub <span class="crumb">/ radix-platform / actions</span>
+      </div>
+      <div class="mini-wrap">
+        <div class="pr-line"><h1>Dispatch EN-19042 <span class="num">· workflow run</span></h1></div>
+        <div class="sub-line">Triggered by the <b>Dispatch</b> click on the Jira ticket</div>
+        <div class="runmini" id="runmini">
+          <div class="rrow" data-d="1"><span class="rok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span><span>Workflow triggered — ticket EN-19042, mode auto</span></div>
+          <div class="rrow sw" data-d="2" style="--t:2.2s"><span class="rrun sp"></span><span class="rok ck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span><span>Launch a Cursor cloud agent for this ticket</span></div>
+        </div>
+      </div>
+    </div>
+
     <!-- CURSOR CLOUD -->
     <div class="view" id="viewCursor">
       <div class="ccloud"><div class="ccard" id="ccard"></div></div>
@@ -1042,14 +1067,14 @@
       <button class="dg-close" id="dgClose">✕</button>
     </div>
     <div class="dg-cols">
-      <div class="dg-col"><span><i style="width:9px;height:9px;border-radius:50%;background:#e89b00;display:block"></i> Engineer</span></div>
+      <div class="dg-col"><span><i style="width:9px;height:9px;border-radius:50%;background:#e89b00;display:block"></i> Human</span></div>
       <div class="dg-col"><span>Jira</span></div>
       <div class="dg-col"><span>GitHub</span></div>
       <div class="dg-col"><span>Cursor Agent</span></div>
     </div>
     <div class="dg-wrap" id="dgWrap"></div>
     <div class="dg-legend">
-      <span><i style="background:#e89b00"></i> Engineer</span>
+      <span><i style="background:#e89b00"></i> Human</span>
       <span><i style="background:#0c66e4"></i> Automation</span>
       <span><i style="background:#7c5cff"></i> AI Agent</span>
     </div>
@@ -1071,15 +1096,16 @@
   const $ = s => document.querySelector(s);
   const okSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg>';
   const cube = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg>';
-  const views = { jira:$('#viewJira'), spec:$('#viewSpec'), pr:$('#viewPr'), cursor:$('#viewCursor') };
+  const views = { jira:$('#viewJira'), actions:$('#viewActions'), spec:$('#viewSpec'), pr:$('#viewPr'), cursor:$('#viewCursor') };
   const tabs  = { jira:$('#tabJira'), gh:$('#tabGh'), cursor:$('#tabCur') };
   const urls  = {
     jira:['radixinc.atlassian.net','/browse/EN-19042'],
+    actions:['github.com','/RadixInc/radix-platform/actions'],
     spec:['github.com','/RadixInc/radix-platform/pull/481'],
     pr:['github.com','/RadixInc/radix-platform/pull/482'],
     cursor:['cursor.com','/agents']
   };
-  const tabFor = { jira:'jira', spec:'gh', pr:'gh', cursor:'cursor' };
+  const tabFor = { jira:'jira', actions:'gh', spec:'gh', pr:'gh', cursor:'cursor' };
 
   function show(view, notify){
     Object.values(views).forEach(v => v.classList.remove('active'));
@@ -1181,8 +1207,8 @@
   /* ============ THE STEPS ============ */
   // short: side-panel name · lane: [from,to] lifelines for the diagram (E=0 J=1 G=2 C=3)
   const steps = [
-    { short:'Ticket', who:'human', title:'It starts with a ticket', lane:[0,1],
-      desc:'An engineer writes <b>what users need and why</b>, with clear acceptance criteria. That\'s the whole input.',
+    { short:'Ticket', who:'human', wholabel:'Human', title:'It starts with a ticket', lane:[0,1],
+      desc:'A ticket is created: <b>what users need and why</b>, with clear acceptance criteria. That is the whole input.',
       enter(){ show('jira'); } },
 
     { short:'Dispatch', who:'human', title:'One click: Dispatch Agent', lane:[0,1],
@@ -1199,8 +1225,17 @@
         else apply(false);
       } },
 
+
+    { short:'Launch', who:'auto', title:'GitHub picks it up', lane:[1,2],
+      desc:'The click lands in GitHub — the orchestrator. A workflow validates the ticket and launches a Cursor agent in the cloud.',
+      enter(anim){
+        show('actions');
+        const r = $('#runmini');
+        r.className = 'runmini ' + (anim ? 'anim' : 'noanim');
+      } },
+
     { short:'Design', who:'agent', title:'An agent writes the design', lane:[2,3],
-      desc:'GitHub launches a Cursor agent in the cloud. It reads the ticket, writes a one-page design, opens the PR — and <b>stops</b>. No code yet.',
+      desc:'The agent reads the ticket and the codebase, writes a one-page design, opens the PR — and <b>stops</b>. No code yet.',
       enter(anim){
         show('cursor');
         const c = $('#ccard');
@@ -1304,7 +1339,7 @@
     Object.values(views).forEach(v => v.scrollTop = 0);
     for (let k = 0; k <= i; k++) steps[k].enter(k === i && forward);
     const s = steps[i];
-    const w = $('#swho'); w.className = 'who ' + s.who; w.textContent = whoLabel[s.who];
+    const w = $('#swho'); w.className = 'who ' + s.who; w.textContent = s.wholabel || whoLabel[s.who];
     $('#stitle').textContent = (i+1) + '. ' + s.title;
     $('#sdesc').innerHTML = s.desc;
     items.forEach((d, k) => d.classList.toggle('on', k === i));
