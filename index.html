@@ -904,19 +904,6 @@
       </div>
     </div>
 
-    <!-- ============ GITHUB · ACTIONS ============ -->
-    <div class="view" id="viewActions">
-      <div class="gh-header">
-        <span class="mark"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></span>
-        <span class="gh-search">Type / to search</span><span class="spacer"></span><span class="av-gh">AF</span>
-      </div>
-      <div class="gh-repobar">
-        <div class="gh-repopath"><svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><a>RadixInc</a><span class="sep">/</span><a><b>radix-platform</b></a><span class="private">Private</span></div>
-        <div class="gh-reptabs"><div class="t">Code</div><div class="t">Pull requests <span class="ct">3</span></div><div class="t on">Actions</div></div>
-      </div>
-      <div class="gh-wrap" id="actionsWrap"></div>
-    </div>
-
     <!-- ============ GITHUB · SPEC PR ============ -->
     <div class="view" id="viewSpec">
       <div class="gh-header">
@@ -938,28 +925,18 @@
 
         <div class="file-hint" id="specHint">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4z"/></svg>
-          <span>The spec the agent drafted — the <b>only file in this PR</b>. Read it, fix anything that's off, and the merge below is the design approval.</span>
+          <span>One page, one file: the design. <b>Merging it is the approval.</b></span>
         </div>
 
         <div class="filebox">
           <div class="filebox-head"><span class="fname">specs/EN-19042/spec.md</span><span class="stat"><span class="a">+41</span> <span class="d">−0</span></span></div>
           <div class="diff">
             <div class="dline add"><span class="ln">1</span><span class="gut">+</span><span class="code"><span class="tok-h"># EN-19042 — Portfolio benchmark CSV export</span></span></div>
-            <div class="dline add"><span class="ln">2</span><span class="gut">+</span><span class="code">&gt; Status: approved   <span class="tok-c"># merging this PR *is* the approval</span></span></div>
-            <div class="dline add"><span class="ln">3</span><span class="gut">+</span><span class="code"></span></div>
-            <div class="dline add"><span class="ln">4</span><span class="gut">+</span><span class="code"><span class="tok-h">## Goal</span></span></div>
-            <div class="dline add"><span class="ln">5</span><span class="gut">+</span><span class="code">Export the benchmark widget's current view to CSV, honoring the</span></div>
-            <div class="dline add"><span class="ln">6</span><span class="gut">+</span><span class="code">active filters, date range and comparison set.</span></div>
-            <div class="dline add"><span class="ln">7</span><span class="gut">+</span><span class="code"></span></div>
-            <div class="dline add"><span class="ln">8</span><span class="gut">+</span><span class="code"><span class="tok-h">## Acceptance Criteria</span> <span class="tok-c"># stable IDs — every one gets a tagged test</span></span></div>
-            <div class="dline add"><span class="ln">9</span><span class="gut">+</span><span class="code">- <span class="tok-h">**AC-1**</span>: When the widget header renders, an Export button shall be</span></div>
-            <div class="dline add"><span class="ln">10</span><span class="gut">+</span><span class="code">  visible for every role, including read-only.</span></div>
-            <div class="dline add"><span class="ln">11</span><span class="gut">+</span><span class="code">- <span class="tok-h">**AC-2**</span>: When the user exports, the CSV shall reflect the active</span></div>
-            <div class="dline add"><span class="ln">12</span><span class="gut">+</span><span class="code">  filters, date range and comparison set.</span></div>
-            <div class="dline add"><span class="ln">13</span><span class="gut">+</span><span class="code">- <span class="tok-h">**AC-3**</span>: The file shall be named `benchmark_{portfolio}_{date}.csv`.</span></div>
-            <div class="dline add"><span class="ln">14</span><span class="gut">+</span><span class="code"></span></div>
-            <div class="dline add"><span class="ln">15</span><span class="gut">+</span><span class="code"><span class="tok-h">## Out of scope</span></span></div>
-            <div class="dline add"><span class="ln">16</span><span class="gut">+</span><span class="code">- Scheduled / emailed exports · PDF format · admin surfaces</span></div>
+            <div class="dline add"><span class="ln">2</span><span class="gut">+</span><span class="code"></span></div>
+            <div class="dline add"><span class="ln">3</span><span class="gut">+</span><span class="code"><span class="tok-h">## Acceptance Criteria</span></span></div>
+            <div class="dline add"><span class="ln">4</span><span class="gut">+</span><span class="code">- <span class="tok-h">**AC-1**</span>: Export button visible for every role, incl. read-only.</span></div>
+            <div class="dline add"><span class="ln">5</span><span class="gut">+</span><span class="code">- <span class="tok-h">**AC-2**</span>: The CSV reflects the active filters and date range.</span></div>
+            <div class="dline add"><span class="ln">6</span><span class="gut">+</span><span class="code">- <span class="tok-h">**AC-3**</span>: File named `benchmark_{portfolio}_{date}.csv`.</span></div>
           </div>
         </div>
 
@@ -998,41 +975,17 @@
         <div class="checks">
           <div class="check-top">
             <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span>
-            <div><b>All checks have passed</b> &nbsp;<span>4 successful checks</span></div>
+            <div><b>All checks have passed</b> &nbsp;<span>build · tests · every AC has a tagged test</span></div>
           </div>
-          <div class="check-item"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span><b>build</b> — Nx affected build <span class="pill">42s</span></div>
-          <div class="check-item"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span><b>unit</b> — 6 new tests, 0 failures <span class="pill">18s</span></div>
-          <div class="check-item"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span><b>e2e</b> — filtered export scenario <span class="pill">1m 04s</span></div>
-          <div class="check-item"><span class="ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span><b>ac-coverage</b> — every AC ID has a tagged test <span class="pill">6s</span></div>
         </div>
 
-        <div class="mdtitle">## Acceptance evidence <span style="font-weight:500;font-size:12px;color:#59636e">— in the PR body · verified on the running app · no evidence files in the repo</span></div>
-        <div class="evnote"><span style="flex-shrink:0;width:20px;height:20px;border-radius:5px;background:#0b0b0f;display:grid;place-items:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span><span><b>From the agent's sandbox:</b> real API + web served against live read-only data, driven by Playwright. Every AC exercised end-to-end before this PR was opened.</span></div>
+        <div class="mdtitle">Acceptance evidence <span style="font-weight:500;font-size:12px;color:#59636e">— verified on the running app, reported in the PR</span></div>
         <table class="evtable">
           <tr><th>AC</th><th>How it was verified in the running app</th><th>Result</th></tr>
-          <tr><td>AC-1</td><td>Loaded the benchmark widget as a read-only user — Export button rendered in the header</td><td>PASS</td></tr>
-          <tr><td>AC-2</td><td>Applied filters + date range, exported — CSV rows matched the filtered view exactly</td><td>PASS</td></tr>
-          <tr><td>AC-3</td><td>Exported "Skyline REIT" on 2026-07-08 → <code style="font-family:var(--mono);font-size:11px">benchmark_skyline-reit_2026-07-08.csv</code></td><td>PASS</td></tr>
+          <tr><td>AC-1</td><td>Opened the widget as a read-only user — Export button is there</td><td>PASS</td></tr>
+          <tr><td>AC-2</td><td>Filtered, exported — the CSV matches the filtered view</td><td>PASS</td></tr>
+          <tr><td>AC-3</td><td>File arrives as <code style="font-family:var(--mono);font-size:11px">benchmark_skyline-reit_2026-07-08.csv</code></td><td>PASS</td></tr>
         </table>
-
-        <div class="filebox" style="margin-top:16px">
-          <div class="filebox-head"><span class="fname">5 files changed — code and tests only</span><span class="stat"><span class="a">+212</span> <span class="d">−4</span></span></div>
-          <div class="diff">
-            <div class="dfile">apps/web/src/benchmark/ExportButton.tsx</div>
-            <div class="dline add"><span class="ln">1</span><span class="gut">+</span><span class="code"><span class="tok-k">export function</span> <span class="tok-h">ExportButton</span>({ view }: Props) {</span></div>
-            <div class="dline add"><span class="ln">2</span><span class="gut">+</span><span class="code">  <span class="tok-k">const</span> rows = useBenchmarkRows(view);</span></div>
-            <div class="dline add"><span class="ln">3</span><span class="gut">+</span><span class="code">  <span class="tok-k">const</span> onClick = () =&gt; downloadCsv(toCsv(rows, view.columns), fileName(view));</span></div>
-            <div class="dline add"><span class="ln">4</span><span class="gut">+</span><span class="code">  <span class="tok-k">return</span> &lt;Button icon=<span class="tok-s">"download"</span> onClick={onClick}&gt;Export CSV&lt;/Button&gt;;</span></div>
-            <div class="dline add"><span class="ln">5</span><span class="gut">+</span><span class="code">}</span></div>
-            <div class="dfile">apps/web/src/benchmark/export.spec.ts</div>
-            <div class="dline add"><span class="ln">1</span><span class="gut">+</span><span class="code">it(<span class="tok-s">'AC-2: exports the active filtered view'</span>, () =&gt; {</span></div>
-            <div class="dline add"><span class="ln">2</span><span class="gut">+</span><span class="code">  expect(toCsv(filtered(rows), { columns })).toMatchSnapshot();</span></div>
-            <div class="dline add"><span class="ln">3</span><span class="gut">+</span><span class="code">});</span></div>
-            <div class="dline add"><span class="ln">4</span><span class="gut">+</span><span class="code">it(<span class="tok-s">'AC-3: names the file benchmark_{portfolio}_{date}.csv'</span>, () =&gt; {</span></div>
-            <div class="dline add"><span class="ln">5</span><span class="gut">+</span><span class="code">  expect(fileName(view)).toBe(<span class="tok-s">'benchmark_skyline-reit_2026-07-08.csv'</span>);</span></div>
-            <div class="dline add"><span class="ln">6</span><span class="gut">+</span><span class="code">});</span></div>
-          </div>
-        </div>
 
         <div class="merge-box" id="prMergeBox">
           <div class="merge-row">
@@ -1058,7 +1011,7 @@
 <div class="flownav">
   <button class="fbtn" id="backBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Back</button>
   <div class="fdots" id="fdots"></div>
-  <span class="fcount" id="fcount">1 / 12</span>
+  <span class="fcount" id="fcount">1 / 9</span>
   <button class="fbtn next" id="nextBtn">Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
 </div>
 
@@ -1076,16 +1029,15 @@
 (function(){
   const $ = s => document.querySelector(s);
   const okSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg>';
-  const views = { jira:$('#viewJira'), actions:$('#viewActions'), spec:$('#viewSpec'), pr:$('#viewPr'), cursor:$('#viewCursor') };
+  const views = { jira:$('#viewJira'), spec:$('#viewSpec'), pr:$('#viewPr'), cursor:$('#viewCursor') };
   const tabs  = { jira:$('#tabJira'), gh:$('#tabGh'), cursor:$('#tabCur') };
   const urls  = {
     jira:['radixinc.atlassian.net','/browse/EN-19042'],
-    actions:['github.com','/RadixInc/radix-platform/actions'],
     spec:['github.com','/RadixInc/radix-platform/pull/481'],
     pr:['github.com','/RadixInc/radix-platform/pull/482'],
     cursor:['cursor.com','/agents']
   };
-  const tabFor = { jira:'jira', actions:'gh', spec:'gh', pr:'gh', cursor:'cursor' };
+  const tabFor = { jira:'jira', spec:'gh', pr:'gh', cursor:'cursor' };
 
   function show(view, notify){
     Object.values(views).forEach(v => v.classList.remove('active'));
@@ -1141,47 +1093,29 @@
   }
   function hidePtr(){ ptr.classList.remove('show','click'); }
 
-  const RUN_DISPATCH =
-    '<h1 class="pr-title" style="font-size:19px">Dispatch EN-19042 · auto <span class="num">run #1204</span></h1>' +
-    '<div class="runcard"><div class="rhead"><span class="rundot"></span><div><div class="rt">launch-triage-agent</div><div class="rs">triggered by repository_dispatch · from the Jira panel</div></div></div>' +
-    '<div class="rstep" data-d="1"><span class="okdot">' + okSvg + '</span><b>Validate ticket key + mode</b><span class="pill">EN-19042 · auto</span></div>' +
-    '<div class="rstep" data-d="2"><span class="okdot">' + okSvg + '</span><b>Skip if an agent is already on this ticket</b><span class="pill">no duplicate</span></div>' +
-    '<div class="rstep" data-d="3"><span class="okdot">' + okSvg + '</span><b>Launch Cursor cloud agent — triage</b><span class="pill">HTTP 201</span></div>' +
-    '<div class="rstep sw" data-d="4" style="--t:2.6s"><span class="rundot sp"></span><span class="okdot ck">' + okSvg + '</span><b>Follow the agent run to completion</b><span class="pill">RUNNING → FINISHED</span></div></div>';
-
-  const RUN_IMPLEMENT =
-    '<h1 class="pr-title" style="font-size:19px">Implement EN-19042 SPEC: portfolio benchmark CSV export <span class="num">run #1207</span></h1>' +
-    '<div class="runcard"><div class="rhead"><span class="rundot"></span><div><div class="rt">implement-on-spec-merge</div><div class="rs">triggered by the spec PR merge — the title marker <b style="font-family:var(--mono)">SPEC:</b> is the signal</div></div></div>' +
-    '<div class="rstep" data-d="1"><span class="okdot">' + okSvg + '</span><b>Merged PR title carries the SPEC: marker</b><span class="pill">design approved</span></div>' +
-    '<div class="rstep" data-d="2"><span class="okdot">' + okSvg + '</span><b>Derive ticket key from the title</b><span class="pill">EN-19042</span></div>' +
-    '<div class="rstep" data-d="3"><span class="okdot">' + okSvg + '</span><b>Launch Cursor cloud agent — implementation</b><span class="pill">HTTP 201</span></div>' +
-    '<div class="rstep sw" data-d="4" style="--t:2.6s"><span class="rundot sp"></span><span class="okdot ck">' + okSvg + '</span><b>Follow the agent run to completion</b><span class="pill">RUNNING → FINISHED</span></div></div>';
-
   const wrow = (d, inner, sw) => sw
     ? '<div class="wrow sw" data-d="' + d + '" style="--t:' + sw + '"><span class="wrun2 sp"></span><span class="wok2 ck">' + okSvg + '</span>' + inner + '</div>'
     : '<div class="wrow" data-d="' + d + '"><span class="wok2">' + okSvg + '</span>' + inner + '</div>';
 
   const CUR_TRIAGE =
     '<div class="cchrome"><span class="cd"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span> Triage EN-19042 <span class="live"><i></i> cloud sandbox</span></div>' +
-    '<div class="cctx">radix-platform · AGENTS.md loaded · spec_mode=auto → Story ⇒ spec-first, no implementation</div>' +
-    '<div class="cmsgc"><span class="cavat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">EN-19042 is a <b>Story</b> with no spec on <b>main</b> — per AGENTS.md this is a spec-first deliverable. I write the design and <b>stop before any code</b>.</div></div></div>' +
+    '<div class="cctx">radix-platform · launched by GitHub, seconds after the Dispatch click</div>' +
+    '<div class="cmsgc"><span class="cavat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">I turn the ticket into a design — and <b>stop before writing any code</b>.</div></div></div>' +
     '<div class="cwork2">' +
-    wrow(1, '<span>Read the Jira ticket — the <b>what</b> and the <b>why</b></span>') +
-    wrow(2, '<span>Study the codebase — widget, selectors, existing CSV utils</span>') +
-    wrow(3, '<span>Write <code>specs/EN-19042/spec.md</code> — EARS criteria, stable AC IDs</span>') +
-    wrow(4, '<span>Open the spec PR <b>myself</b> — title <code>EN-19042 SPEC: …</code>, ready for review</span>', '3s') +
+    wrow(1, '<span>Read the ticket and the codebase</span>') +
+    wrow(2, '<span>Write the spec — one acceptance criterion at a time</span>') +
+    wrow(3, '<span>Open the spec PR, ready for review</span>', '2.4s') +
     '</div>';
 
   const CUR_IMPL =
     '<div class="cchrome"><span class="cd"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span> Implement EN-19042 <span class="live"><i></i> cloud sandbox</span></div>' +
-    '<div class="cctx">approved spec: specs/EN-19042/spec.md · real API + web + read-only data in the sandbox</div>' +
-    '<div class="cmsgc"><span class="cavat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">The design is approved. I build it <b>test-first</b> and prove it on the <b>running app</b> — if it does not pass here, it never reaches a human.</div></div></div>' +
+    '<div class="cctx">launched automatically by the spec merge · approved design in hand</div>' +
+    '<div class="cmsgc"><span class="cavat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">If it does not pass in my sandbox, it never reaches a human.</div></div></div>' +
     '<div class="cwork2">' +
-    wrow(1, '<span>TDD — one failing test per AC: <code>it(\'AC-1: …\')</code></span>') +
-    wrow(2, '<span>Implement — <code>ExportButton</code>, <code>toCsv</code>, wiring</span>') +
-    wrow(3, '<span>Boot the <b>real app</b> — API + web against live read-only data</span>') +
-    wrow(4, '<span>Playwright acceptance run — <code>3 passed (3.8s)</code>, every AC exercised</span>') +
-    wrow(5, '<span>Open the implementation PR <b>myself</b> — evidence in the PR body</span>', '3.4s') +
+    wrow(1, '<span>Write the tests first — one per acceptance criterion</span>') +
+    wrow(2, '<span>Build the feature</span>') +
+    wrow(3, '<span><b>Run the real app</b> and verify every criterion live</span>') +
+    wrow(4, '<span>Open the PR — with the proof in it</span>', '2.8s') +
     '</div>';
 
   function setMerged(stateEl, footEl){
@@ -1209,12 +1143,12 @@
   // Each step: who, title, desc, and enter(anim) — called after a full scene reset,
   // in order, for every step up to the current one. Only the current step animates.
   const steps = [
-    { who:'human', title:'The ticket',
-      desc:'An engineer writes EN-19042 as a <b>PRD</b> — what users need and why, with testable acceptance criteria. No design, no implementation details. This is the most leveraged writing of the whole flow.',
+    { who:'human', title:'It starts with a ticket',
+      desc:'An engineer writes <b>what users need and why</b>, with clear acceptance criteria. That\'s the whole input.',
       enter(){ show('jira'); } },
 
     { who:'human', title:'One click: Dispatch Agent',
-      desc:'The engineer picks the repo + mode and clicks <b>Dispatch</b> — and that\'s it. This is the last human action until the design is ready to review.',
+      desc:'Pick the repo, click <b>Dispatch</b>. This is the last human action until the design is ready to review.',
       enter(anim){
         show('jira');
         const st = $('#dspStatus');
@@ -1228,17 +1162,8 @@
         else apply(false);
       } },
 
-    { who:'auto', title:'GitHub validates & launches',
-      desc:'The <code>dispatch-agent</code> workflow checks the ticket, guards against duplicates, launches a Cursor cloud agent, and <b>follows the run live</b>. Failures would be reported back to the ticket automatically.',
-      enter(anim){
-        show('actions');
-        const w = $('#actionsWrap');
-        w.innerHTML = RUN_DISPATCH;
-        w.className = 'gh-wrap ' + (anim ? 'anim' : 'noanim');
-      } },
-
-    { who:'agent', title:'The agent writes the spec',
-      desc:'In its own cloud sandbox the agent reads the ticket and the codebase, writes an <b>EARS spec</b>, and opens the spec PR itself. Then it <b>stops</b> — no code until a human approves the design.',
+    { who:'agent', title:'An agent writes the design',
+      desc:'GitHub launches a Cursor agent in the cloud. It reads the ticket, writes a one-page spec, opens the PR — and <b>stops</b>. No code yet.',
       enter(anim){
         show('cursor');
         const c = $('#ccard');
@@ -1246,16 +1171,16 @@
         c.className = 'ccard ' + (anim ? 'anim' : 'noanim');
       } },
 
-    { who:'auto', title:'Spec PR + Jira ping',
-      desc:'The PR title carries the <code>SPEC:</code> marker — <b>the signal all automation keys on</b> (the agent works on its own <code>cursor/*</code> branch, so branch names mean nothing). A Jira rule instantly comments on the ticket.',
+    { who:'auto', title:'The spec PR is ready — Jira pings you',
+      desc:'A comment lands on the ticket the moment the PR opens. <b>You get pulled in exactly when needed — not before.</b>',
       enter(anim){
         show('spec', anim ? 'jira' : null);
         jiraComment({ name:'Automation for Jira', badge:'rule',
-          text:'Spec PR ready for review — review it, then <b>merge to green-light the implementation</b>: <a>PR #481</a>' }, false);
+          text:'Spec PR ready for review — merge it to green-light the implementation: <a>PR #481</a>' }, false);
       } },
 
-    { who:'human', title:'Gate 1 — approve the design',
-      desc:'The engineer reads the one-page spec, fixes or challenges anything that\'s off, and merges. <b>The merge is the approval</b> — minutes spent here save hours of reviewing wrong code later.',
+    { who:'human', title:'Approve the design',
+      desc:'Read one page. Fix what\'s off. <b>Merge = approved.</b> Minutes here save hours of reviewing wrong code later.',
       enter(anim){
         show('spec');
         const apply = () => { setMerged($('#specState'), $('#specMergeFoot')); };
@@ -1263,17 +1188,8 @@
         else apply();
       } },
 
-    { who:'auto', title:'The merge triggers the builder',
-      desc:'No human relays anything: <code>implement-on-spec-merge</code> fires off the <code>SPEC:</code> title marker and launches the implementation agent. Loop-safe — code PRs carry no marker, so they never re-trigger.',
-      enter(anim){
-        show('actions');
-        const w = $('#actionsWrap');
-        w.innerHTML = RUN_IMPLEMENT;
-        w.className = 'gh-wrap ' + (anim ? 'anim' : 'noanim');
-      } },
-
-    { who:'agent', title:'Build test-first, prove it live',
-      desc:'A fresh agent implements the approved spec with <b>TDD</b>, then boots the real app in its sandbox and drives it with Playwright. Only when every AC passes end-to-end does it open the PR — itself.',
+    { who:'agent', title:'An agent builds it — and proves it',
+      desc:'The merge automatically launches a second agent. It writes the tests first, builds the feature, and <b>verifies every criterion on the running app</b> before opening the PR.',
       enter(anim){
         show('cursor');
         const c = $('#ccard');
@@ -1281,23 +1197,17 @@
         c.className = 'ccard ' + (anim ? 'anim' : 'noanim');
       } },
 
-    { who:'auto', title:'The PR arrives with its proof',
-      desc:'Checks are green — including <code>ac-coverage</code>, which <b>blocks</b> any implementation PR whose spec ACs lack tagged tests. The <b>acceptance evidence lives in the PR body</b>; the diff is code and tests only.',
+    { who:'auto', title:'The PR arrives with its proof — Jira moves to Code Review',
+      desc:'Green checks, and the <b>evidence in the PR itself</b>: how each criterion was verified live. The ticket updates on its own.',
       enter(anim){
         show('pr', anim ? 'jira' : null);
-      } },
-
-    { who:'auto', title:'Jira: ready for review',
-      desc:'The same PR event drives the ticket: a comment with the PR link, and the status moves to <b>Code Review</b> — automatically. Nobody shepherds tickets by hand.',
-      enter(anim){
-        show('jira');
         jiraComment({ name:'Automation for Jira', badge:'rule',
-          text:'Implementation PR ready for review: <a>PR #482</a> · status → <b>Code Review</b>' }, anim);
-        setStatus('Code Review', 'prog', anim);
+          text:'Implementation PR ready for review: <a>PR #482</a> · status → <b>Code Review</b>' }, false);
+        setStatus('Code Review', 'prog', false);
       } },
 
-    { who:'human', title:'Gate 2 — review & merge',
-      desc:'The engineer reads a small, spec-shaped diff where every AC cites its test and its live verification. The review is <b>verification, not archaeology</b>. Merge when it\'s right; comment and push back when it isn\'t.',
+    { who:'human', title:'Review & merge',
+      desc:'The second and final gate: read the code, check the proof, merge. <b>Nothing ships without an engineer\'s judgement.</b>',
       enter(anim){
         show('pr');
         const apply = withAnim => { setMerged($('#prState'), $('#prMergeFoot')); if (withAnim) confetti(); };
@@ -1305,8 +1215,8 @@
         else apply(false);
       } },
 
-    { who:'auto', title:'Ticket → Done. Loop closed.',
-      desc:'The merge transitions EN-19042 to <b>Done</b>. Total human effort: <b>one ticket, one click, two reviews</b>. Everything else — spec, code, tests, live verification, every status update — was agents and automation.',
+    { who:'auto', title:'Done — the loop closes itself',
+      desc:'The ticket moves to <b>Done</b> on its own. Total human effort: <b>a ticket, a click, two reviews.</b> Everything else was agents and automation.',
       enter(anim){
         show('jira');
         jiraComment({ name:'Automation for Jira', badge:'rule',
@@ -1323,7 +1233,6 @@
     $('#dspStatus').classList.remove('anim');
     setStatus('To Do', '', false);
     ['#ac1','#ac2','#ac3'].forEach(s => $(s).classList.remove('acdone'));
-    $('#actionsWrap').innerHTML = '';
     $('#ccard').innerHTML = '';
     // spec PR back to open
     const ss = $('#specState');
