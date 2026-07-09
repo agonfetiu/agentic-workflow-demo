@@ -870,6 +870,15 @@
                    border-bottom:1px solid #22282f;font-family:var(--mono);font-size:12px;font-weight:700}
   .flowterm .thead i{width:10px;height:10px;border-radius:50%;display:block}
   .specq.resolved{background:#dcfff1;border-color:#a6f0cf;color:#216e4e}
+  /* ---- auto-advance indicator + human-turn pulse ---- */
+  .autonote{display:none;align-items:center;gap:8px;padding:0 18px 8px;font-size:10.5px;font-weight:800;
+            letter-spacing:.04em;text-transform:uppercase;color:#0055cc}
+  .autonote .aspin{width:11px;height:11px;border:2px solid #b3d4ff;border-top-color:#0c66e4;border-radius:50%;
+                   animation:spin .8s linear infinite;flex-shrink:0}
+  .autonote .abar{flex:1;height:3px;background:#e2e8f2;border-radius:2px;overflow:hidden}
+  .autonote .abar i{display:block;height:100%;width:0;background:#0c66e4}
+  .fbtn.next.attn{animation:btnpulse 1.7s infinite}
+  @keyframes btnpulse{0%{box-shadow:0 0 0 0 rgba(12,102,228,.5)}70%{box-shadow:0 0 0 10px rgba(12,102,228,0)}100%{box-shadow:0 0 0 0 rgba(12,102,228,0)}}
   /* ---- generic popup ---- */
   .pop{position:fixed;inset:0;background:rgba(18,26,46,.6);z-index:210;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
   .pop.open{display:flex}
@@ -1156,6 +1165,7 @@
     <div class="dtitle" id="stitle"></div>
     <p id="sdesc"></p>
   </div>
+  <div class="autonote" id="autonote"><span class="aspin"></span><span>runs by itself</span><span class="abar"><i id="autofill"></i></span></div>
   <div class="sp-nav">
     <button class="fbtn" id="backBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Back</button>
     <button class="fbtn next" id="nextBtn">Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
@@ -1421,7 +1431,7 @@
       } },
 
 
-    { short:'Launch', who:'auto', title:'GitHub picks it up', lane:[1,2],
+    { short:'Launch', who:'auto', wait:3600, title:'GitHub picks it up', lane:[1,2],
       desc:'The click lands in GitHub — the orchestrator. A workflow validates the ticket and launches a Cursor agent in the cloud.',
       enter(anim){
         show('actions');
@@ -1429,7 +1439,7 @@
         r.className = 'runmini ' + (anim ? 'anim' : 'noanim');
       } },
 
-    { short:'Design', who:'agent', title:'An agent writes the design', lane:[2,3],
+    { short:'Design', who:'agent', wait:4400, title:'An agent writes the design', lane:[2,3],
       desc:'The agent reads the ticket and the codebase, writes a one-page design, opens the PR — and <b>stops</b>. No code yet.',
       enter(anim){
         show('cursor');
@@ -1438,7 +1448,7 @@
         c.className = 'ccard ' + (anim ? 'anim' : 'noanim');
       } },
 
-    { short:'Spec PR', who:'auto', title:'The design PR is ready — Jira pings you', lane:[3,2],
+    { short:'Spec PR', who:'auto', wait:4400, title:'The design PR is ready — Jira pings you', lane:[3,2],
       desc:'A comment lands on the ticket the moment the PR opens. The design carries <b>two open architecture questions</b> the agent could not decide alone.',
       enter(anim){
         show('spec', anim ? 'jira' : null);
@@ -1468,7 +1478,7 @@
         }, 1400);
       } },
 
-    { short:'Build', who:'agent', title:'An agent builds it — and proves it', lane:[2,3],
+    { short:'Build', who:'agent', wait:4800, title:'An agent builds it — and proves it', lane:[2,3],
       desc:'The merge automatically launches a second agent. It writes the tests first, builds the feature, and <b>verifies every criterion on the running app</b> before opening the PR.',
       enter(anim){
         show('cursor');
@@ -1477,7 +1487,7 @@
         c.className = 'ccard ' + (anim ? 'anim' : 'noanim');
       } },
 
-    { short:'Proof', who:'auto', title:'The PR arrives with its proof', lane:[3,2],
+    { short:'Proof', who:'auto', wait:5200, title:'The PR arrives with its proof', lane:[3,2],
       desc:'Green checks, and the <b>evidence in the PR itself</b>: how each criterion was verified live. The ticket moves to <b>Code Review</b> on its own.',
       enter(anim){
         show('pr', anim ? 'jira' : null);
@@ -1568,6 +1578,25 @@
     $('#backBtn').disabled = i === 0;
     $('#nextBtn').disabled = i === steps.length - 1;
     dgRows.forEach((r, k) => r.classList.toggle('on', k === i));
+
+    // The rhythm IS the message: non-human steps continue by themselves;
+    // human steps wait for the click.
+    const isLast = i === steps.length - 1;
+    const autoStep = forward && s.who !== 'human' && !isLast;
+    $('#nextBtn').classList.toggle('attn', s.who === 'human' && !isLast);
+    const note = $('#autonote'), fill = $('#autofill');
+    if (autoStep){
+      const wait = s.wait || 3600;
+      note.style.display = 'flex';
+      fill.style.transition = 'none'; fill.style.width = '0%';
+      void fill.offsetWidth;
+      fill.style.transition = 'width ' + wait + 'ms linear';
+      fill.style.width = '100%';
+      const tok = seq;
+      setTimeout(() => { if (tok === seq) go(i + 1); }, wait);
+    } else {
+      note.style.display = 'none';
+    }
   }
 
   /* ============ SEQUENCE DIAGRAM ============ */
