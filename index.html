@@ -1082,6 +1082,23 @@
           <tr><td>AC-2</td><td>Filtered, exported — the CSV matches the view</td><td>PASS</td></tr>
           <tr><td>AC-3</td><td>File arrives with the right name</td><td>PASS</td></tr>
         </table>
+        <div class="mini-h" style="margin-top:18px">The code <span style="font-weight:500;color:#8a93a6">— written by the agent, reviewed by you</span></div>
+        <div class="filebox" style="margin-bottom:16px">
+          <div class="filebox-head"><span class="fname">5 files changed</span><span class="stat"><span class="a">+212</span> <span class="d">−4</span></span></div>
+          <div class="diff">
+            <div class="dfile">apps/web/src/benchmark/ExportButton.tsx</div>
+            <div class="dline add"><span class="ln">1</span><span class="gut">+</span><span class="code"><span class="tok-k">export function</span> <span class="tok-h">ExportButton</span>({ view }: Props) {</span></div>
+            <div class="dline add"><span class="ln">2</span><span class="gut">+</span><span class="code">  <span class="tok-k">const</span> rows = useBenchmarkRows(view);</span></div>
+            <div class="dline add"><span class="ln">3</span><span class="gut">+</span><span class="code">  <span class="tok-k">const</span> onClick = () =&gt; downloadCsv(toCsv(rows, view.columns), fileName(view));</span></div>
+            <div class="dline add"><span class="ln">4</span><span class="gut">+</span><span class="code">  <span class="tok-k">return</span> &lt;Button icon=<span class="tok-s">"download"</span> onClick={onClick}&gt;Export CSV&lt;/Button&gt;;</span></div>
+            <div class="dline add"><span class="ln">5</span><span class="gut">+</span><span class="code">}</span></div>
+            <div class="dfile">apps/web/src/benchmark/export.spec.ts</div>
+            <div class="dline add"><span class="ln">1</span><span class="gut">+</span><span class="code">it(<span class="tok-s">'AC-2: exports the active filtered view'</span>, () =&gt; {</span></div>
+            <div class="dline add"><span class="ln">2</span><span class="gut">+</span><span class="code">  expect(toCsv(filtered(rows), { columns })).toMatchSnapshot();</span></div>
+            <div class="dline add"><span class="ln">3</span><span class="gut">+</span><span class="code">});</span></div>
+          </div>
+        </div>
+
         <div class="merge-box" id="prMergeBox">
           <div class="merge-row">
             <span class="merge-ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span>
@@ -1123,17 +1140,7 @@
   <div class="flowterm" id="flowTerm">
     <div class="tcard">
       <div class="thead"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>&nbsp; Terminal — local machine · ~/radix-platform</div>
-      <div class="termbody" id="flowTermBody">
-        <div class="tl p" data-d="1">~/radix-platform $ git checkout spec/EN-19042 &amp;&amp; claude</div>
-        <div class="tl you" data-d="2">&gt; answer the open questions in specs/EN-19042/spec.md with me</div>
-        <div class="tl ag" data-d="3">Agent — Q1: generate the CSV client-side, or stream it from the BFF for large portfolios?</div>
-        <div class="tl you" data-d="4">&gt; client-side — the export is bounded by the visible view, no BFF work needed</div>
-        <div class="tl ag" data-d="5">Agent — Q2: reuse the benchmark module&#8217;s toCsv util, or promote it to libs/shared?</div>
-        <div class="tl you" data-d="6">&gt; keep it in the module — promote only when a second consumer appears</div>
-        <div class="tl ag" data-d="7">Agent — recording both decisions in the spec, closing the questions, committing…</div>
-        <div class="tl okl" data-d="8">✓ pushed — the spec PR now carries the decisions</div>
-      </div>
-      <div class="pcap" style="color:#8b949e">Preparing the design is engineering work too — the spec is refined locally, with an agent, then the PR updates.</div>
+      <div class="termbody" id="flowTermBody" style="min-height:280px"></div>
     </div>
   </div>
 </div>
@@ -1273,6 +1280,46 @@
     })();
   }
 
+  const TERM_LINES = [
+    { c:'p',   t:'~/radix-platform $ git checkout spec/EN-19042 && claude', typed:true },
+    { c:'you', t:'> answer the open questions in specs/EN-19042/spec.md with me', typed:true },
+    { c:'ag',  t:'Agent \u2014 Q1: generate the CSV client-side, or stream it from the BFF for large portfolios?' },
+    { c:'you', t:'> client-side \u2014 the export is bounded by the visible view, no BFF work needed', typed:true },
+    { c:'ag',  t:'Agent \u2014 Q2: reuse the benchmark module\u2019s toCsv util, or promote it to libs/shared?' },
+    { c:'you', t:'> keep it in the module \u2014 promote only when a second consumer appears', typed:true },
+    { c:'ag',  t:'Agent \u2014 recording both decisions in the spec, closing the questions, committing\u2026' },
+    { c:'okl', t:'\u2713 pushed \u2014 the spec PR now carries the decisions' }
+  ];
+  function renderTermAll(){
+    const tb = $('#flowTermBody');
+    tb.innerHTML = TERM_LINES.map(L => '<div class="tl ' + L.c + '">' + L.t.replace(/</g,'&lt;') + '</div>').join('');
+  }
+  function playTerm(tok){
+    const tb = $('#flowTermBody');
+    tb.innerHTML = '';
+    let idx = 0;
+    (function nextLine(){
+      if (tok !== seq) return;
+      if (idx >= TERM_LINES.length) return;
+      const L = TERM_LINES[idx++];
+      const d = document.createElement('div');
+      d.className = 'tl ' + L.c;
+      tb.appendChild(d);
+      if (L.typed){
+        let k = 0;
+        (function t(){
+          if (tok !== seq) return;
+          d.textContent = L.t.slice(0, ++k);
+          if (k < L.t.length) setTimeout(t, 20);
+          else setTimeout(nextLine, 500);
+        })();
+      } else {
+        d.textContent = L.t;
+        setTimeout(nextLine, L.c === 'ag' ? 800 : 550);
+      }
+    })();
+  }
+
   const actorBar = $('#actorbar');
   const personSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>';
   const cubeSvg2 = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 7v10l9 5 9-5V7z"/><path d="M12 2v20M3 7l9 5 9-5"/></svg>';
@@ -1403,10 +1450,9 @@
       desc:'The engineer pulls the spec branch and works the questions through in a <b>local agent session</b>. The agent records the decisions in the spec and pushes — the PR updates.',
       enter(anim){
         show('spec');
-        const ft = $('#flowTerm');
-        ft.classList.add('show');
-        const tb = $('#flowTermBody');
-        tb.className = 'termbody ' + (anim ? 'anim' : 'noanim');
+        $('#flowTerm').classList.add('show');
+        if (anim) playTerm(seq);
+        else renderTermAll();
       } },
 
     { short:'Approve', who:'human', title:'Approve the design', lane:[0,2],
