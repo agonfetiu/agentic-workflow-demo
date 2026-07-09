@@ -684,121 +684,177 @@
 </head>
 <body>
 <style>
-  /* ===== additions for the guided flow (same visual language) ===== */
-  body{flex-direction:column;gap:0}
-  .browser{height:min(760px,80vh)}
-  /* step banner */
-  .stepbar{width:min(1320px,95vw);display:flex;align-items:center;gap:14px;margin-bottom:14px;
-           background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;padding:13px 18px;
-           box-shadow:0 10px 30px -12px rgba(30,40,70,.25)}
-  .stepbar .snum{width:34px;height:34px;border-radius:10px;background:#eef1f6;color:#44546f;display:grid;place-items:center;
-                 font-weight:800;font-size:14px;flex-shrink:0;font-variant-numeric:tabular-nums}
+  /* ===== guided flow — minimal views, side panel, diagram ===== */
+  .layout{display:flex;gap:16px;align-items:stretch;width:min(1460px,97vw);height:min(820px,92vh)}
+  .layout .browser{flex:1;width:auto;height:100%;min-width:0}
   .who{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
        padding:5px 12px;border-radius:20px;flex-shrink:0}
   .who.human{background:#fff3d6;color:#8a5d00;border:1px solid #f0d492}
   .who.auto{background:#e9f2ff;color:#0055cc;border:1px solid #cfe0f5}
   .who.agent{background:#f3f0ff;color:#5e4db2;border:1px solid #ddd3f7}
-  .stepbar .stitle{font-size:15px;font-weight:700;color:#172b4d;flex-shrink:0}
-  .stepbar .sdesc{font-size:13px;color:#44546f;line-height:1.45}
-  .stepbar .sdesc b{color:#172b4d}
-  .stepbar .sdesc code{font-family:var(--mono);font-size:11.5px;background:#f1f2f4;padding:1px 6px;border-radius:4px;color:#172b4d}
-  /* nav */
-  .flownav{width:min(1320px,95vw);display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px}
-  .fbtn{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid rgba(0,0,0,.1);color:#172b4d;
-        font-size:13.5px;font-weight:700;padding:10px 20px;border-radius:10px;cursor:pointer;
-        box-shadow:0 6px 18px -8px rgba(30,40,70,.3);transition:transform .12s, box-shadow .2s;font-family:'Inter'}
-  .fbtn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 10px 26px -8px rgba(30,40,70,.4)}
+
+  /* ---- side panel ---- */
+  .sidepanel{width:320px;flex-shrink:0;background:#fff;border:1px solid rgba(0,0,0,.07);border-radius:13px;
+             box-shadow:0 30px 80px -30px rgba(30,40,70,.35);display:flex;flex-direction:column;overflow:hidden}
+  .sp-head{padding:15px 18px 12px;border-bottom:1px solid #eef0f4}
+  .sp-title{font-size:15px;font-weight:800;color:#172b4d;letter-spacing:-.01em}
+  .sp-sub{font-size:11.5px;color:#8a93a6;margin-top:3px}
+  .sp-steps{flex:1;overflow-y:auto;padding:8px 10px}
+  .sp-step{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;
+           font-size:12.5px;font-weight:600;color:#44546f;transition:background .12s}
+  .sp-step:hover{background:#f4f6f9}
+  .sp-step .n{width:21px;height:21px;border-radius:7px;background:#eef1f6;display:grid;place-items:center;
+              font-size:10.5px;font-weight:800;color:#626f86;flex-shrink:0;font-variant-numeric:tabular-nums}
+  .sp-step .adot{width:8px;height:8px;border-radius:50%;margin-left:auto;flex-shrink:0}
+  .adot.human{background:#e89b00}.adot.auto{background:#0c66e4}.adot.agent{background:#7c5cff}
+  .sp-step.on{background:#e9f2ff;color:#0c3d8d}
+  .sp-step.on .n{background:#0c66e4;color:#fff}
+  .sp-desc{padding:12px 18px 4px;border-top:1px solid #eef0f4}
+  .sp-desc .dtitle{font-size:13.5px;font-weight:800;color:#172b4d;margin-top:8px}
+  .sp-desc p{font-size:12.5px;color:#44546f;line-height:1.55;margin-top:6px;min-height:76px}
+  .sp-desc p b{color:#172b4d}
+  .sp-nav{display:flex;gap:10px;padding:8px 18px 10px}
+  .fbtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:1px solid rgba(0,0,0,.12);
+        color:#172b4d;font-size:13px;font-weight:700;padding:10px 0;border-radius:9px;cursor:pointer;
+        transition:transform .12s, box-shadow .2s;font-family:'Inter'}
+  .fbtn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 20px -10px rgba(30,40,70,.4)}
   .fbtn:disabled{opacity:.35;cursor:default}
   .fbtn.next{background:#0c66e4;border-color:#0c66e4;color:#fff}
   .fbtn svg{width:15px;height:15px}
-  .fdots{display:flex;align-items:center;gap:6px}
-  .fdot{width:8px;height:8px;border-radius:50%;background:#c3cad6;cursor:pointer;transition:.15s}
-  .fdot.hu{background:#f0c368}
-  .fdot.on{background:#0c66e4;transform:scale(1.35)}
-  .fdot.hu.on{background:#e89b00}
-  .fcount{font-size:12px;font-weight:700;color:#626f86;min-width:46px;text-align:center;font-variant-numeric:tabular-nums}
-  .keyhint{position:fixed;bottom:16px;right:20px;font-size:11.5px;color:#8a93a6}
-  .keyhint b{font-family:var(--mono);font-size:10.5px;background:#fff;border:1px solid #dfe1e6;border-radius:5px;padding:2px 6px;color:#44546f;font-weight:600}
-  /* staged reveals inside newly-entered content */
-  .anim [data-d]{opacity:0;animation:slideIn .45s ease both}
-  .anim [data-d="1"]{animation-delay:.15s}.anim [data-d="2"]{animation-delay:.5s}
-  .anim [data-d="3"]{animation-delay:.9s}.anim [data-d="4"]{animation-delay:1.3s}
-  .anim [data-d="5"]{animation-delay:1.75s}.anim [data-d="6"]{animation-delay:2.2s}
-  .anim .sw .sp{animation:swHide .1s linear both;animation-delay:var(--t,2.6s)}
-  .anim .sw .ck{opacity:0;animation:swShow .25s ease both;animation-delay:var(--t,2.6s)}
-  .noanim .sw .sp{display:none}
-  .noanim .sw .ck{opacity:1}
-  @keyframes swHide{to{opacity:0;width:0;margin-right:-10px;overflow:hidden}}
-  @keyframes swShow{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
-  /* github actions run box (composed from existing look) */
-  .runcard{border:1px solid var(--gh-border);border-radius:10px;overflow:hidden;margin-top:14px;background:#fff}
-  .runcard .rhead{display:flex;align-items:center;gap:11px;padding:13px 16px;border-bottom:1px solid var(--gh-border);background:var(--gh-canvas)}
-  .runcard .rhead .rt{font-weight:600;font-size:14px;color:var(--gh-text)}
-  .runcard .rhead .rs{font-size:12.5px;color:var(--gh-sub)}
-  .rstep{display:flex;align-items:center;gap:11px;padding:10px 16px;font-size:13px;color:var(--gh-sub)}
-  .rstep:not(:last-child){border-bottom:1px solid #eaeef2}
-  .rstep b{color:var(--gh-text);font-weight:500}
-  .rstep .pill{margin-left:auto;font-size:12px;font-family:var(--mono);color:var(--gh-sub)}
-  .okdot{width:18px;height:18px;border-radius:50%;background:var(--gh-green);color:#fff;display:grid;place-items:center;flex-shrink:0}
-  .okdot svg{width:11px;height:11px}
-  .rundot{width:15px;height:15px;border:2px solid #b3d4ff;border-top-color:var(--jira-blue);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
-  .evnote{display:flex;gap:10px;align-items:flex-start;background:#f6f8fa;border:1px solid var(--gh-border);border-radius:8px;
-          padding:11px 14px;font-size:12.5px;color:var(--gh-sub);line-height:1.5;margin:12px 0 4px}
-  .evnote b{color:var(--gh-text)}
-  .evtable{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px;border:1px solid var(--gh-border);border-radius:8px;overflow:hidden}
-  .evtable th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--gh-sub);padding:7px 12px;border-bottom:1px solid var(--gh-border);background:var(--gh-canvas)}
-  .evtable td{padding:7px 12px;border-bottom:1px solid #eaeef2;color:#44546f;line-height:1.45;background:#fff}
+  .sp-diagbtn{margin:0 18px 14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+              background:#f4f6f9;border:1px solid #e2e5ea;color:#44546f;font-size:12.5px;font-weight:700;
+              padding:9px 0;border-radius:9px;cursor:pointer;font-family:'Inter'}
+  .sp-diagbtn:hover{background:#e9edf3}
+  .sp-diagbtn svg{width:14px;height:14px}
+  .keyhint{position:fixed;bottom:14px;right:20px;font-size:11px;color:#8a93a6}
+  .keyhint b{font-family:var(--mono);font-size:10px;background:#fff;border:1px solid #dfe1e6;border-radius:5px;padding:2px 6px;color:#44546f;font-weight:600}
+
+  /* ---- minimal in-browser views ---- */
+  .mini-app{display:flex;align-items:center;gap:9px;padding:11px 26px;border-bottom:1px solid #e9ebf0;
+            font-size:13px;font-weight:800;color:#172b4d;position:sticky;top:0;background:#fff;z-index:5}
+  .mini-app .crumb{font-weight:500;color:#8a93a6;font-size:12.5px}
+  .mini-wrap{max-width:720px;margin:0 auto;padding:28px 34px 50px}
+  .mini-title{font-size:21px;font-weight:600;color:#172b4d;letter-spacing:-.01em;line-height:1.3;margin:2px 0 14px}
+  .mini-h{font-size:12.5px;font-weight:700;color:#172b4d;margin:24px 0 12px}
+  .mini-acs{margin:18px 0 4px}
+  .pr-line{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:6px}
+  .pr-line h1{font-size:19px;font-weight:600;color:#1f2328;line-height:1.3}
+  .pr-line h1 .num{color:#59636e;font-weight:400}
+  .sub-line{font-size:12.5px;color:#59636e;margin-bottom:18px}
+  .sub-line b{color:#1f2328}
+  .ghlab{font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
+  .ghlab.spec{background:#ddf4ff;color:#0969da;border:1px solid #b6e3ff}
+  .ghlab.impl{background:#dafbe1;color:#116329;border:1px solid #aceebb}
+  .speccard{border:1px solid #d1d9e0;border-radius:10px;overflow:hidden;margin:6px 0 14px}
+  .speccard .sc-head{background:#f6f8fa;border-bottom:1px solid #d1d9e0;padding:8px 15px;font-family:var(--mono);font-size:12px;font-weight:600;color:#1f2328}
+  .speccard .sc-body{padding:15px 17px;background:#fff}
+  .speccard .sc-t{font-size:14.5px;font-weight:700;color:#1f2328;margin-bottom:11px}
+  .specac{display:flex;gap:9px;font-size:13px;color:#44546f;line-height:1.55;margin-bottom:7px}
+  .specac b{font-family:var(--mono);font-size:11px;color:#0055cc;background:#e9f2ff;border-radius:4px;padding:1px 7px;height:fit-content;margin-top:1px;flex-shrink:0}
+  .checksline{display:flex;align-items:center;gap:10px;border:1px solid #d1d9e0;border-radius:10px;padding:11px 15px;
+              font-size:13px;color:#59636e;margin-bottom:14px;background:#fff}
+  .checksline .ci{width:22px;height:22px;border-radius:50%;background:#1f883d;color:#fff;display:grid;place-items:center;flex-shrink:0}
+  .checksline .ci svg{width:13px;height:13px}
+  .checksline b{color:#1f2328}
+  .evtable{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0 16px;border:1px solid #d1d9e0;border-radius:8px;overflow:hidden}
+  .evtable th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:#59636e;padding:7px 13px;border-bottom:1px solid #d1d9e0;background:#f6f8fa}
+  .evtable td{padding:8px 13px;border-bottom:1px solid #eaeef2;color:#44546f;line-height:1.45;background:#fff}
   .evtable tr:last-child td{border-bottom:none}
   .evtable td:first-child{font-family:var(--mono);font-weight:600;color:#0550ae;white-space:nowrap}
   .evtable td:last-child{color:#116329;font-weight:700;white-space:nowrap}
-  .mdtitle{font-size:15px;font-weight:700;color:var(--gh-text);margin:16px 0 4px;padding-bottom:6px;border-bottom:1px solid var(--gh-border)}
-  .ghlab{font-family:var(--mono);font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px;margin-left:2px}
-  .ghlab.spec{background:#ddf4ff;color:#0969da;border:1px solid #b6e3ff}
-  .ghlab.impl{background:#dafbe1;color:#116329;border:1px solid #aceebb}
-  /* cursor cloud view */
-  .ccloud{min-height:100%;background:#0e0e10;display:flex;align-items:flex-start;justify-content:center;padding:44px 30px}
-  .ccard{width:min(680px,90%);background:#161616;border:1px solid #2c2c2c;border-radius:13px;color:#d4d4d4;overflow:hidden;
-         box-shadow:0 30px 80px -30px rgba(0,0,0,.8)}
-  .cchrome{height:40px;background:#232323;display:flex;align-items:center;gap:9px;padding:0 16px;font-size:13px;color:#fff;font-weight:700}
-  .cchrome .cd{width:18px;height:18px;border-radius:5px;background:#0b0b0f;border:1px solid #3a3a3a;display:grid;place-items:center;font-size:11px}
-  .cchrome .live{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#7ee2a0}
-  .cchrome .live i{width:7px;height:7px;border-radius:50%;background:#3fb950;display:block;animation:blink 1.4s infinite}
-  @keyframes blink{50%{opacity:.3}}
-  .cctx{padding:9px 17px;background:#1d1d1d;border-bottom:1px solid #2c2c2c;font-family:var(--mono);font-size:11.5px;color:#8fa0c0}
-  .cmsgc{display:flex;gap:11px;padding:15px 17px 6px}
-  .cavat{width:27px;height:27px;border-radius:7px;background:#0b0b0f;border:1px solid #3a3a3a;display:grid;place-items:center;flex-shrink:0;font-size:12px}
-  .cbody .cn{font-size:12px;font-weight:700;color:#eaeaea;margin-bottom:5px}
-  .cbody .ct{font-size:13px;color:#c4c9d2;line-height:1.6}
-  .cbody .ct b{color:#fff}
-  .cwork2{margin:13px 17px 17px;border:1px solid #2c2c2c;border-radius:10px;background:#1b1b1b;overflow:hidden}
-  .wrow{display:flex;align-items:center;gap:10px;padding:9px 13px;font-size:12.5px;color:#b7bdca}
-  .wrow:not(:last-child){border-bottom:1px solid #262626}
-  .wrow b{color:#e8e8e8;font-weight:600}
-  .wrow code{font-family:var(--mono);font-size:11px;color:#8fa0c0}
-  .wok2{width:16px;height:16px;border-radius:50%;background:#15301d;color:#3fb950;display:grid;place-items:center;flex-shrink:0}
-  .wok2 svg{width:10px;height:10px}
-  .wrun2{width:14px;height:14px;border:2px solid #2a3f66;border-top-color:#7c93ff;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
-  /* jira dispatch panel */
-  .dsp .lblx{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--jira-faint);margin:11px 0 6px}
-  .dsp .msel{border:1px solid var(--jira-border);border-radius:8px;padding:7px 9px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-  .dsp .rchip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;font-family:var(--mono);background:#e9f2ff;color:#0055cc;border:1px solid #cfe0f5;padding:3px 8px;border-radius:7px}
-  .dsp .selrow{display:flex;align-items:center;gap:9px;margin-top:12px}
-  .dsp .drop{flex-shrink:0;width:96px;border:1px solid var(--jira-border);border-radius:8px;padding:8px 11px;font-size:12.5px;display:flex;align-items:center;justify-content:space-between;color:var(--jira-text);font-weight:500}
-  .dsp .go{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--jira-blue);color:#fff;border:none;font-size:13px;font-weight:600;padding:9px 0;border-radius:8px;cursor:default}
-  .dsp .okban{display:flex;gap:9px;align-items:flex-start;background:#dcfff1;border:1px solid #a6f0cf;border-radius:9px;padding:10px 12px;font-size:12px;color:#216e4e;line-height:1.5;margin-top:11px}
+
+  /* ---- dispatch card ---- */
+  .dsp{border:1px solid var(--jira-border);border-radius:11px;overflow:hidden;margin:22px 0 4px}
+  .dsp .dsp-head{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--jira-text);
+                 padding:11px 15px;border-bottom:1px solid var(--jira-border)}
+  .dsp .dsp-body{padding:12px 15px;font-size:12.5px;color:var(--jira-sub);line-height:1.5}
+  .dsp .lblx{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--jira-faint);margin:2px 0 6px}
+  .dsp .rchip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;font-family:var(--mono);
+              background:#e9f2ff;color:#0055cc;border:1px solid #cfe0f5;padding:5px 10px;border-radius:7px}
+  .dsp .selrow{display:flex;align-items:center;gap:9px;margin-top:12px;max-width:400px}
+  .dsp .drop{flex-shrink:0;width:92px;border:1px solid var(--jira-border);border-radius:8px;padding:8px 11px;font-size:12.5px;
+             display:flex;align-items:center;justify-content:space-between;color:var(--jira-text);font-weight:500}
+  .dsp .go{flex:1;display:inline-flex;align-items:center;justify-content:center;background:var(--jira-blue);color:#fff;border:none;
+           font-size:13px;font-weight:600;padding:9px 0;border-radius:8px;cursor:default;font-family:'Inter'}
+  .dsp .okban{display:flex;gap:9px;align-items:flex-start;background:#dcfff1;border:1px solid #a6f0cf;border-radius:9px;
+              padding:10px 12px;font-size:12px;color:#216e4e;line-height:1.5;margin-top:12px}
   .dsp .okban b{display:block;color:#164b35}
-  .dsp .runrow{display:flex;align-items:center;gap:8px;font-size:11.5px;margin-top:9px;color:var(--jira-sub)}
-  .dsp .runrow .rname{font-family:var(--mono);font-size:11px;color:var(--jira-text)}
   .statuspulse{animation:stpulse 1.6s ease 1}
   @keyframes stpulse{0%{box-shadow:0 0 0 0 rgba(12,102,228,.55)}100%{box-shadow:0 0 0 14px rgba(12,102,228,0)}}
   .acdone .box{background:#1f883d;border-color:#1f883d;position:relative}
   .acdone .box::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:11px;font-weight:800}
   .acdone{color:#8a93a6;text-decoration:line-through}
-  /* confetti */
-  .cfp{position:fixed;top:-14px;width:9px;height:15px;z-index:99;animation:cfall linear forwards}
-  @keyframes cfall{to{transform:translateY(105vh) rotate(660deg)}}
-  /* animated demo mouse pointer */
-  .mpointer{position:fixed;left:50%;top:70%;z-index:120;width:26px;height:26px;pointer-events:none;opacity:0;
+
+  /* ---- cursor cloud ---- */
+  .ccloud{min-height:100%;background:#0e0e10;display:flex;align-items:flex-start;justify-content:center;padding:46px 30px}
+  .ccard{width:min(620px,90%);background:#161616;border:1px solid #2c2c2c;border-radius:13px;color:#d4d4d4;overflow:hidden;
+         box-shadow:0 30px 80px -30px rgba(0,0,0,.8)}
+  .cchrome{height:40px;background:#232323;display:flex;align-items:center;gap:9px;padding:0 16px;font-size:13px;color:#fff;font-weight:700}
+  .cchrome .cd{width:18px;height:18px;border-radius:5px;background:#0b0b0f;border:1px solid #3a3a3a;display:grid;place-items:center}
+  .cchrome .live{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#7ee2a0}
+  .cchrome .live i{width:7px;height:7px;border-radius:50%;background:#3fb950;display:block;animation:blink 1.4s infinite}
+  @keyframes blink{50%{opacity:.3}}
+  .cmsgc{display:flex;gap:11px;padding:15px 17px 6px}
+  .cavat{width:27px;height:27px;border-radius:7px;background:#0b0b0f;border:1px solid #3a3a3a;display:grid;place-items:center;flex-shrink:0}
+  .cbody .cn{font-size:12px;font-weight:700;color:#eaeaea;margin-bottom:5px}
+  .cbody .ct{font-size:13px;color:#c4c9d2;line-height:1.6}
+  .cbody .ct b{color:#fff}
+  .cwork2{margin:13px 17px 17px;border:1px solid #2c2c2c;border-radius:10px;background:#1b1b1b;overflow:hidden}
+  .wrow{display:flex;align-items:center;gap:10px;padding:10px 13px;font-size:12.5px;color:#b7bdca}
+  .wrow:not(:last-child){border-bottom:1px solid #262626}
+  .wrow b{color:#e8e8e8;font-weight:600}
+  .wok2{width:16px;height:16px;border-radius:50%;background:#15301d;color:#3fb950;display:grid;place-items:center;flex-shrink:0}
+  .wok2 svg{width:10px;height:10px}
+  .wrun2{width:14px;height:14px;border:2px solid #2a3f66;border-top-color:#7c93ff;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+
+  /* staged reveals */
+  .anim [data-d]{opacity:0;animation:slideIn .45s ease both}
+  .anim [data-d="1"]{animation-delay:.15s}.anim [data-d="2"]{animation-delay:.5s}
+  .anim [data-d="3"]{animation-delay:.9s}.anim [data-d="4"]{animation-delay:1.3s}
+  .anim .sw .sp{animation:swHide .1s linear both;animation-delay:var(--t,2.2s)}
+  .anim .sw .ck{opacity:0;animation:swShow .25s ease both;animation-delay:var(--t,2.2s)}
+  .noanim .sw .sp{display:none}
+  .noanim .sw .ck{opacity:1}
+  @keyframes swHide{to{opacity:0;width:0;margin-right:-10px;overflow:hidden}}
+  @keyframes swShow{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+
+  /* ---- sequence diagram overlay ---- */
+  .diagram{position:fixed;inset:0;background:rgba(18,26,46,.6);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+  .diagram.open{display:flex}
+  .dg-card{width:min(920px,93vw);max-height:92vh;background:#fff;border-radius:16px;padding:24px 30px 26px;overflow:auto;
+           box-shadow:0 50px 130px -30px rgba(0,0,0,.55)}
+  .dg-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+  .dg-head b{font-size:16px;color:#172b4d}
+  .dg-head span{font-size:12px;color:#8a93a6}
+  .dg-close{margin-left:auto;width:30px;height:30px;border-radius:8px;border:1px solid #e2e5ea;background:#f7f8fa;
+            color:#44546f;font-size:15px;cursor:pointer;display:grid;place-items:center;font-family:'Inter'}
+  .dg-close:hover{background:#eceef3}
+  .dg-cols{display:flex;margin-bottom:4px}
+  .dg-col{flex:1;text-align:center}
+  .dg-col span{display:inline-flex;align-items:center;gap:7px;padding:7px 15px;border:1px solid #dfe1e6;border-radius:9px;
+               background:#f7f8fa;font-size:12.5px;font-weight:800;color:#172b4d}
+  .dg-wrap{position:relative;padding:8px 0 4px}
+  .dg-life{position:absolute;top:0;bottom:0;width:0;border-left:2px dashed #dbe0e8;pointer-events:none}
+  .dg-row{position:relative;height:47px;cursor:pointer;border-radius:8px}
+  .dg-row:hover{background:#f4f7fc}
+  .dg-row.on{background:#e9f2ff}
+  .dg-arr{position:absolute;top:29px;height:2px}
+  .dg-arr.human{background:#e89b00;color:#e89b00}
+  .dg-arr.auto{background:#0c66e4;color:#0c66e4}
+  .dg-arr.agent{background:#7c5cff;color:#7c5cff}
+  .dg-arr::after{content:"";position:absolute;top:-5px;border:6px solid transparent}
+  .dg-arr.dir-r::after{right:-3px;border-left:8px solid currentColor}
+  .dg-arr.dir-l::after{left:-3px;border-right:8px solid currentColor}
+  .dg-lab{position:absolute;top:6px;font-size:11.5px;font-weight:700;color:#44546f;transform:translateX(-50%);white-space:nowrap;
+          display:inline-flex;align-items:center;gap:6px}
+  .dg-lab .stepno{font-size:10px;font-weight:800;background:#eef1f6;color:#626f86;border-radius:5px;padding:1px 6px}
+  .dg-row.hu .dg-lab .stepno{background:#fff3d6;color:#8a5d00}
+  .dg-legend{display:flex;gap:16px;justify-content:center;margin-top:16px;font-size:11.5px;font-weight:700;color:#626f86}
+  .dg-legend span{display:inline-flex;align-items:center;gap:7px}
+  .dg-legend i{width:9px;height:9px;border-radius:50%;display:block}
+
+  /* ---- demo mouse pointer ---- */
+  .mpointer{position:fixed;left:50%;top:70%;z-index:220;width:26px;height:26px;pointer-events:none;opacity:0;
             transition:left 1s cubic-bezier(.35,.75,.25,1), top 1s cubic-bezier(.35,.75,.25,1), opacity .25s;
             filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
   .mpointer.show{opacity:1}
@@ -808,199 +864,147 @@
   .mpointer .ring{position:absolute;left:-9px;top:-9px;width:44px;height:44px;border-radius:50%;border:3px solid #0c66e4;opacity:0;z-index:1}
   .mpointer.click .ring{animation:mring .55s ease-out}
   @keyframes mring{0%{opacity:.85;transform:scale(.35)}100%{opacity:0;transform:scale(1.25)}}
+  /* confetti */
+  .cfp{position:fixed;top:-14px;width:9px;height:15px;z-index:99;animation:cfall linear forwards}
+  @keyframes cfall{to{transform:translateY(105vh) rotate(660deg)}}
 </style>
 
-<div class="stepbar">
-  <span class="snum" id="snum">1</span>
-  <span class="who human" id="swho">Engineer</span>
-  <span class="stitle" id="stitle">The ticket</span>
-  <span class="sdesc" id="sdesc">…</span>
-</div>
-
+<div class="layout">
 <div class="browser">
   <div class="tabstrip">
     <div class="tab active" id="tabJira">
       <span class="notif"></span>
       <span class="fav" style="background:#0c66e4"><svg width="11" height="11" viewBox="0 0 24 24" fill="#fff"><path d="M12 2 4 10l4 4 4-4 4 4 4-4z" opacity=".9"/></svg></span>
-      <span class="ttl">EN-19042 - Radix Platform</span><span class="x">×</span>
+      <span class="ttl">EN-19042 - Jira</span><span class="x">×</span>
     </div>
     <div class="tab" id="tabGh">
       <span class="notif"></span>
       <span class="fav" style="background:#24292f"><svg width="11" height="11" viewBox="0 0 16 16" fill="#fff"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></span>
-      <span class="ttl">RadixInc/radix-platform</span><span class="x">×</span>
+      <span class="ttl">radix-platform - GitHub</span><span class="x">×</span>
     </div>
     <div class="tab" id="tabCur">
       <span class="notif"></span>
       <span class="fav" style="background:#0b0b0f"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span>
-      <span class="ttl">Cursor — Cloud Agents</span><span class="x">×</span>
+      <span class="ttl">Cursor — Cloud Agent</span><span class="x">×</span>
     </div>
   </div>
 
   <div class="toolbar">
     <div class="nav-ico dim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></div>
     <div class="nav-ico dim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
-    <div class="nav-ico" onclick="location.reload()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.7 3M3 4v5h5"/></svg></div>
     <div class="urlbar">
       <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>
       <span><span class="u-host" id="urlHost">radixinc.atlassian.net</span><span class="u-path" id="urlPath">/browse/EN-19042</span></span>
-      <svg class="star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.2l5.9-.9z"/></svg>
     </div>
   </div>
 
   <div class="viewport">
 
-    <!-- ============ JIRA ============ -->
+    <!-- JIRA -->
     <div class="view active" id="viewJira">
-      <div class="jira-nav">
-        <div class="jira-logo"><svg width="22" height="22" viewBox="0 0 24 24"><defs><linearGradient id="jg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2684ff"/><stop offset="1" stop-color="#0052cc"/></linearGradient></defs><path fill="url(#jg)" d="M12 2 3 11l4 4 5-5 5 5 4-4z"/><path fill="#2684ff" d="M12 22l9-9-4-4-5 5-5-5-4 4z" opacity=".75"/></svg> Jira</div>
-        <div class="crumbs"><span class="sep">/</span><a>Radix Platform</a><span class="sep">/</span><a>EN-19042</a></div>
-        <div class="spacer"></div><div class="av-me">AF</div>
+      <div class="mini-app">
+        <svg width="18" height="18" viewBox="0 0 24 24"><defs><linearGradient id="jg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2684ff"/><stop offset="1" stop-color="#0052cc"/></linearGradient></defs><path fill="url(#jg)" d="M12 2 3 11l4 4 5-5 5 5 4-4z"/><path fill="#2684ff" d="M12 22l9-9-4-4-5 5-5-5-4 4z" opacity=".75"/></svg>
+        Jira <span class="crumb">/ EN-19042</span>
       </div>
-      <div class="jira-wrap">
-        <div class="jira-main">
-          <div class="issue-key-row"><span class="itype"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 6"/></svg></span> EN-19042</div>
-          <h1 class="issue-title">Add CSV export to the portfolio benchmark widget</h1>
-          <div class="issue-toolbar">
-            <button class="status-btn" id="statusBtn"><span id="statusText">To Do</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
-            <button class="btn-sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Comment</button>
-          </div>
-          <h3 class="sec-label">Description</h3>
-          <div class="desc-box">
-            <p>Property managers want to pull benchmark comparisons into their own decks. Add a <b>CSV export</b> from the portfolio benchmark widget that respects the active view mode &amp; filters.</p>
-            <div class="ac-title">Acceptance criteria</div>
-            <div class="ac" id="ac1"><span class="box"></span><span>AC-1 — Export button visible in the widget header (read-only roles included)</span></div>
-            <div class="ac" id="ac2"><span class="box"></span><span>AC-2 — CSV reflects the current filters, date range &amp; comparison set</span></div>
-            <div class="ac" id="ac3"><span class="box"></span><span>AC-3 — Filename format: <code>benchmark_{portfolio}_{date}.csv</code></span></div>
-          </div>
-
-          <div class="panel dsp" id="dspPanel" style="margin:24px 0 8px">
-            <div class="panel-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="#0c66e4" style="vertical-align:-2px;margin-right:2px"><path d="M13 2L4.9 12.5H11L9.8 22l8.6-11.5H12z"/></svg> Dispatch Agent</div>
-            <div style="padding:12px 14px;font-size:12.5px;color:var(--jira-sub);line-height:1.5" id="dspBody">
-              Launch a Cursor cloud agent for this ticket through the GitHub agentic flow.
-              <div class="lblx">Repositories</div>
-              <div class="msel"><span class="rchip">RadixInc/radix-platform ✕</span></div>
-              <div class="selrow" style="max-width:420px">
-                <div class="drop">auto <span style="opacity:.5">▾</span></div>
-                <button class="go" id="dspGo">Dispatch</button>
-              </div>
-              <div id="dspStatus"></div>
+      <div class="mini-wrap">
+        <h1 class="mini-title">Add CSV export to the portfolio benchmark widget</h1>
+        <button class="status-btn" id="statusBtn"><span id="statusText">To Do</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div class="mini-acs">
+          <div class="mini-h" style="margin-top:0">Acceptance criteria</div>
+          <div class="ac" id="ac1"><span class="box"></span><span>Export button visible for every role</span></div>
+          <div class="ac" id="ac2"><span class="box"></span><span>CSV reflects the active filters</span></div>
+          <div class="ac" id="ac3"><span class="box"></span><span>File named <code>benchmark_{portfolio}_{date}.csv</code></span></div>
+        </div>
+        <div class="dsp" id="dspPanel">
+          <div class="dsp-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="#0c66e4"><path d="M13 2L4.9 12.5H11L9.8 22l8.6-11.5H12z"/></svg> Dispatch Agent</div>
+          <div class="dsp-body">
+            <div class="lblx">Repository</div>
+            <span class="rchip">RadixInc/radix-platform ✕</span>
+            <div class="selrow">
+              <div class="drop">auto <span style="opacity:.5">▾</span></div>
+              <button class="go" id="dspGo">Dispatch</button>
             </div>
-          </div>
-
-          <div class="activity">
-            <div class="activity-head"><h3 class="sec-label" style="margin:0">Activity</h3><div class="tabs"><button>All</button><button class="on">Comments</button><button>History</button></div></div>
-            <div class="cmt-input"><div class="av me">AF</div><div class="field">Add a comment…</div></div>
-            <div id="jiraComments"></div>
+            <div id="dspStatus"></div>
           </div>
         </div>
-        <div class="jira-side">
-          <div class="panel">
-            <div class="panel-head">Details</div>
-            <div class="field-row"><span class="k">Assignee</span><span class="v"><span class="av-sm none">?</span> Unassigned</span></div>
-            <div class="field-row" style="border-top:1px solid var(--jira-border)"><span class="k">Reporter</span><span class="v"><span class="av-sm me">AF</span> Agon Fetiu</span></div>
-            <div class="field-row" style="border-top:1px solid var(--jira-border)"><span class="k">Labels</span><span class="v" style="color:#626f86;font-weight:400">analytics, export</span></div>
-          </div>
-        </div>
+        <div class="mini-h">Activity</div>
+        <div id="jiraComments"></div>
       </div>
     </div>
 
-    <!-- ============ GITHUB · SPEC PR ============ -->
+    <!-- GITHUB · SPEC PR -->
     <div class="view" id="viewSpec">
-      <div class="gh-header">
-        <span class="mark"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></span>
-        <span class="gh-search">Type / to search</span><span class="spacer"></span><span class="av-gh">AF</span>
+      <div class="mini-app">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="#24292f"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub <span class="crumb">/ radix-platform / pull / 481</span>
       </div>
-      <div class="gh-repobar">
-        <div class="gh-repopath"><svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><a>RadixInc</a><span class="sep">/</span><a><b>radix-platform</b></a><span class="private">Private</span></div>
-        <div class="gh-reptabs"><div class="t">Code</div><div class="t on">Pull requests <span class="ct">3</span></div><div class="t">Actions</div></div>
-      </div>
-      <div class="gh-wrap">
-        <h1 class="pr-title"><span style="background:#fff3d6;border-bottom:2px solid #e8b53a;padding:0 4px;border-radius:3px">EN-19042 SPEC:</span> portfolio benchmark CSV export <span class="num">#481</span></h1>
-        <div class="pr-meta">
+      <div class="mini-wrap">
+        <div class="pr-line">
           <span class="pr-state" id="specState"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9c0 7-12 3-12 6"/></svg> Open</span>
-          <span class="sub"><b>Cursor Agent</b> wants to merge 1 commit into <span class="br">main</span> from <span class="br">cursor/triage-en-19042</span></span>
+          <h1>EN-19042 SPEC: portfolio benchmark CSV export <span class="num">#481</span></h1>
           <span class="ghlab spec">spec</span>
         </div>
-        <div class="pr-tabs"><div class="pt">Conversation <span class="ct">1</span></div><div class="pt">Commits <span class="ct">1</span></div><div class="pt on">Files changed <span class="ct">1</span></div></div>
-
-        <div class="file-hint" id="specHint">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 013 3L12 15l-4 1 1-4z"/></svg>
-          <span>One page, one file: the design. <b>Merging it is the approval.</b></span>
-        </div>
-
-        <div class="filebox">
-          <div class="filebox-head"><span class="fname">specs/EN-19042/spec.md</span><span class="stat"><span class="a">+41</span> <span class="d">−0</span></span></div>
-          <div class="diff">
-            <div class="dline add"><span class="ln">1</span><span class="gut">+</span><span class="code"><span class="tok-h"># EN-19042 — Portfolio benchmark CSV export</span></span></div>
-            <div class="dline add"><span class="ln">2</span><span class="gut">+</span><span class="code"></span></div>
-            <div class="dline add"><span class="ln">3</span><span class="gut">+</span><span class="code"><span class="tok-h">## Acceptance Criteria</span></span></div>
-            <div class="dline add"><span class="ln">4</span><span class="gut">+</span><span class="code">- <span class="tok-h">**AC-1**</span>: Export button visible for every role, incl. read-only.</span></div>
-            <div class="dline add"><span class="ln">5</span><span class="gut">+</span><span class="code">- <span class="tok-h">**AC-2**</span>: The CSV reflects the active filters and date range.</span></div>
-            <div class="dline add"><span class="ln">6</span><span class="gut">+</span><span class="code">- <span class="tok-h">**AC-3**</span>: File named `benchmark_{portfolio}_{date}.csv`.</span></div>
+        <div class="sub-line">Opened by <b>Cursor Agent</b> · one file — the design, nothing else</div>
+        <div class="speccard">
+          <div class="sc-head">specs/EN-19042/spec.md</div>
+          <div class="sc-body">
+            <div class="sc-t">EN-19042 — Portfolio benchmark CSV export</div>
+            <div class="specac"><b>AC-1</b><span>Export button visible for every role, incl. read-only.</span></div>
+            <div class="specac"><b>AC-2</b><span>The CSV reflects the active filters and date range.</span></div>
+            <div class="specac"><b>AC-3</b><span>File named <code style="font-family:var(--mono);font-size:11.5px">benchmark_{portfolio}_{date}.csv</code>.</span></div>
           </div>
         </div>
-
         <div class="merge-box" id="specMergeBox">
-          <div class="merge-row" id="specMergeRow">
+          <div class="merge-row">
             <span class="merge-ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span>
-            <div><div class="mt">All checks passed — this branch has no conflicts</div><div class="ms">Merging the spec is the <b>green light</b>: it triggers the implementation agent automatically.</div></div>
+            <div><div class="mt">Ready to merge</div><div class="ms">Merging the design is the <b>green light</b> — implementation starts automatically.</div></div>
           </div>
           <div class="merge-foot" id="specMergeFoot">
             <button class="btn-merge">Merge pull request</button>
-            <span class="fnote">You're approving the design before any code is written.</span>
+            <span class="fnote">You're approving the design — before any code exists.</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ============ GITHUB · IMPLEMENTATION PR ============ -->
+    <!-- GITHUB · IMPLEMENTATION PR -->
     <div class="view" id="viewPr">
-      <div class="gh-header">
-        <span class="mark"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></span>
-        <span class="gh-search">Type / to search</span><span class="spacer"></span><span class="av-gh">AF</span>
+      <div class="mini-app">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="#24292f"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.6 7.6 0 014 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        GitHub <span class="crumb">/ radix-platform / pull / 482</span>
       </div>
-      <div class="gh-repobar">
-        <div class="gh-repopath"><svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><a>RadixInc</a><span class="sep">/</span><a><b>radix-platform</b></a><span class="private">Private</span></div>
-        <div class="gh-reptabs"><div class="t">Code</div><div class="t on">Pull requests <span class="ct">3</span></div><div class="t">Actions</div></div>
-      </div>
-      <div class="gh-wrap">
-        <h1 class="pr-title">EN-19042: portfolio benchmark CSV export <span class="num">#482</span></h1>
-        <div class="pr-meta">
+      <div class="mini-wrap">
+        <div class="pr-line">
           <span class="pr-state" id="prState"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9c0 7-12 3-12 6"/></svg> Open</span>
-          <span class="sub"><b>Cursor Agent</b> wants to merge 4 commits into <span class="br">main</span> from <span class="br">cursor/implement-en-19042</span></span>
+          <h1>EN-19042: portfolio benchmark CSV export <span class="num">#482</span></h1>
           <span class="ghlab impl">impl</span>
         </div>
-        <div class="pr-tabs"><div class="pt on">Conversation <span class="ct">1</span></div><div class="pt">Commits <span class="ct">4</span></div><div class="pt">Checks <span class="ct">4</span></div><div class="pt">Files changed <span class="ct">5</span></div></div>
-
-        <div class="checks">
-          <div class="check-top">
-            <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span>
-            <div><b>All checks have passed</b> &nbsp;<span>build · tests · every AC has a tagged test</span></div>
-          </div>
+        <div class="sub-line">Opened by <b>Cursor Agent</b> · code and tests only</div>
+        <div class="checksline">
+          <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span>
+          <span><b>All checks have passed</b> — build, tests, and every criterion has a test</span>
         </div>
-
-        <div class="mdtitle">Acceptance evidence <span style="font-weight:500;font-size:12px;color:#59636e">— verified on the running app, reported in the PR</span></div>
+        <div class="mini-h" style="margin-top:18px">Acceptance evidence <span style="font-weight:500;color:#8a93a6">— verified on the running app</span></div>
         <table class="evtable">
-          <tr><th>AC</th><th>How it was verified in the running app</th><th>Result</th></tr>
-          <tr><td>AC-1</td><td>Opened the widget as a read-only user — Export button is there</td><td>PASS</td></tr>
-          <tr><td>AC-2</td><td>Filtered, exported — the CSV matches the filtered view</td><td>PASS</td></tr>
-          <tr><td>AC-3</td><td>File arrives as <code style="font-family:var(--mono);font-size:11px">benchmark_skyline-reit_2026-07-08.csv</code></td><td>PASS</td></tr>
+          <tr><th>AC</th><th>Verified in the running app</th><th>Result</th></tr>
+          <tr><td>AC-1</td><td>Opened the widget as a read-only user — button is there</td><td>PASS</td></tr>
+          <tr><td>AC-2</td><td>Filtered, exported — the CSV matches the view</td><td>PASS</td></tr>
+          <tr><td>AC-3</td><td>File arrives with the right name</td><td>PASS</td></tr>
         </table>
-
         <div class="merge-box" id="prMergeBox">
           <div class="merge-row">
             <span class="merge-ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg></span>
-            <div><div class="mt">This branch has no conflicts with the base branch</div><div class="ms">Merging auto-transitions EN-19042 to <b>Done</b> — the loop closes itself.</div></div>
+            <div><div class="mt">Ready to merge</div><div class="ms">Merging closes the loop — the ticket moves to <b>Done</b> on its own.</div></div>
           </div>
           <div class="merge-foot" id="prMergeFoot">
             <button class="btn-merge">Merge pull request</button>
-            <span class="fnote">You've read the code and checked the evidence — this is the final gate.</span>
+            <span class="fnote">The final gate: your judgement, on verified work.</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ============ CURSOR CLOUD ============ -->
+    <!-- CURSOR CLOUD -->
     <div class="view" id="viewCursor">
       <div class="ccloud"><div class="ccard" id="ccard"></div></div>
     </div>
@@ -1008,11 +1012,48 @@
   </div>
 </div>
 
-<div class="flownav">
-  <button class="fbtn" id="backBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Back</button>
-  <div class="fdots" id="fdots"></div>
-  <span class="fcount" id="fcount">1 / 9</span>
-  <button class="fbtn next" id="nextBtn">Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+<div class="sidepanel">
+  <div class="sp-head">
+    <div class="sp-title">The Agentic Flow</div>
+    <div class="sp-sub">One ticket, start to Done — who does what</div>
+  </div>
+  <div class="sp-steps" id="spSteps"></div>
+  <div class="sp-desc">
+    <span class="who human" id="swho">Engineer</span>
+    <div class="dtitle" id="stitle"></div>
+    <p id="sdesc"></p>
+  </div>
+  <div class="sp-nav">
+    <button class="fbtn" id="backBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Back</button>
+    <button class="fbtn next" id="nextBtn">Next <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+  </div>
+  <button class="sp-diagbtn" id="diagBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h6M14 5h6M4 12h16M4 19h9"/><circle cx="7" cy="5" r="1.6" fill="currentColor"/><circle cx="17" cy="12" r="1.6" fill="currentColor"/><circle cx="10" cy="19" r="1.6" fill="currentColor"/></svg>
+    View as sequence diagram
+  </button>
+</div>
+</div>
+
+<!-- sequence diagram overlay -->
+<div class="diagram" id="diagram">
+  <div class="dg-card">
+    <div class="dg-head">
+      <b>The flow as a sequence</b><span>click any step to jump to it</span>
+      <button class="dg-close" id="dgClose">✕</button>
+    </div>
+    <div class="dg-cols">
+      <div class="dg-col"><span><i style="width:9px;height:9px;border-radius:50%;background:#e89b00;display:block"></i> Engineer</span></div>
+      <div class="dg-col"><span>Jira</span></div>
+      <div class="dg-col"><span>GitHub</span></div>
+      <div class="dg-col"><span>Cursor Agent</span></div>
+    </div>
+    <div class="dg-wrap" id="dgWrap"></div>
+    <div class="dg-legend">
+      <span><i style="background:#e89b00"></i> Engineer</span>
+      <span><i style="background:#0c66e4"></i> Automation</span>
+      <span><i style="background:#7c5cff"></i> AI Agent</span>
+    </div>
+  </div>
 </div>
 
 <div class="keyhint"><b>←</b> <b>→</b> also work</div>
@@ -1029,6 +1070,7 @@
 (function(){
   const $ = s => document.querySelector(s);
   const okSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5L20 6"/></svg>';
+  const cube = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg>';
   const views = { jira:$('#viewJira'), spec:$('#viewSpec'), pr:$('#viewPr'), cursor:$('#viewCursor') };
   const tabs  = { jira:$('#tabJira'), gh:$('#tabGh'), cursor:$('#tabCur') };
   const urls  = {
@@ -1049,12 +1091,11 @@
     $('#urlPath').textContent = urls[view][1];
   }
 
-  function jiraComment({name, badge, text, cls}, anim){
+  function jiraComment({name, text}, anim){
     const d = document.createElement('div');
     d.className = 'cmt' + (anim ? ' flash' : '');
-    d.innerHTML = '<div class="av ' + (cls||'cursor') + '" style="background:#3b6af0;color:#fff">A</div>' +
-      '<div class="c-body"><div class="c-head"><b>' + name + '</b>' +
-      (badge ? '<span class="bot">' + badge + '</span>' : '') +
+    d.innerHTML = '<div class="av" style="background:#3b6af0;color:#fff;font-weight:800">A</div>' +
+      '<div class="c-body"><div class="c-head"><b>' + name + '</b><span class="bot">rule</span>' +
       '<span class="time">just now</span></div><div class="c-text">' + text + '</div></div>';
     $('#jiraComments').appendChild(d);
   }
@@ -1066,7 +1107,7 @@
     if (anim){ btn.classList.add('statuspulse'); setTimeout(()=>btn.classList.remove('statuspulse'), 1700); }
   }
 
-  /* ---- the visible demo mouse: travels to a button, clicks it, then the result applies ---- */
+  /* ---- the visible demo mouse ---- */
   let seq = 0;
   const ptr = $('#mpointer');
   function clickWith(target, tok, onClick){
@@ -1076,8 +1117,8 @@
       if (tok !== seq) return;
       const r = target.getBoundingClientRect();
       ptr.style.transition = 'none';
-      ptr.style.left = (r.left + r.width/2 + 170) + 'px';
-      ptr.style.top  = (r.top + r.height/2 + 150) + 'px';
+      ptr.style.left = (r.left + r.width/2 + 160) + 'px';
+      ptr.style.top  = (r.top + r.height/2 + 140) + 'px';
       void ptr.offsetWidth;
       ptr.style.transition = '';
       ptr.classList.add('show');
@@ -1098,21 +1139,19 @@
     : '<div class="wrow" data-d="' + d + '"><span class="wok2">' + okSvg + '</span>' + inner + '</div>';
 
   const CUR_TRIAGE =
-    '<div class="cchrome"><span class="cd"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span> Triage EN-19042 <span class="live"><i></i> cloud sandbox</span></div>' +
-    '<div class="cctx">radix-platform · launched by GitHub, seconds after the Dispatch click</div>' +
-    '<div class="cmsgc"><span class="cavat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">I turn the ticket into a design — and <b>stop before writing any code</b>.</div></div></div>' +
+    '<div class="cchrome"><span class="cd">' + cube + '</span> Design agent · EN-19042 <span class="live"><i></i> cloud sandbox</span></div>' +
+    '<div class="cmsgc"><span class="cavat">' + cube + '</span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">I turn the ticket into a design — and <b>stop before writing any code</b>.</div></div></div>' +
     '<div class="cwork2">' +
     wrow(1, '<span>Read the ticket and the codebase</span>') +
-    wrow(2, '<span>Write the spec — one acceptance criterion at a time</span>') +
+    wrow(2, '<span>Write the design — one criterion at a time</span>') +
     wrow(3, '<span>Open the spec PR, ready for review</span>', '2.4s') +
     '</div>';
 
   const CUR_IMPL =
-    '<div class="cchrome"><span class="cd"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span> Implement EN-19042 <span class="live"><i></i> cloud sandbox</span></div>' +
-    '<div class="cctx">launched automatically by the spec merge · approved design in hand</div>' +
-    '<div class="cmsgc"><span class="cavat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">If it does not pass in my sandbox, it never reaches a human.</div></div></div>' +
+    '<div class="cchrome"><span class="cd">' + cube + '</span> Build agent · EN-19042 <span class="live"><i></i> cloud sandbox</span></div>' +
+    '<div class="cmsgc"><span class="cavat">' + cube + '</span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">If it does not pass in my sandbox, it never reaches a human.</div></div></div>' +
     '<div class="cwork2">' +
-    wrow(1, '<span>Write the tests first — one per acceptance criterion</span>') +
+    wrow(1, '<span>Write the tests first — one per criterion</span>') +
     wrow(2, '<span>Build the feature</span>') +
     wrow(3, '<span><b>Run the real app</b> and verify every criterion live</span>') +
     wrow(4, '<span>Open the PR — with the proof in it</span>', '2.8s') +
@@ -1140,30 +1179,28 @@
   }
 
   /* ============ THE STEPS ============ */
-  // Each step: who, title, desc, and enter(anim) — called after a full scene reset,
-  // in order, for every step up to the current one. Only the current step animates.
+  // short: side-panel name · lane: [from,to] lifelines for the diagram (E=0 J=1 G=2 C=3)
   const steps = [
-    { who:'human', title:'It starts with a ticket',
+    { short:'Ticket', who:'human', title:'It starts with a ticket', lane:[0,1],
       desc:'An engineer writes <b>what users need and why</b>, with clear acceptance criteria. That\'s the whole input.',
       enter(){ show('jira'); } },
 
-    { who:'human', title:'One click: Dispatch Agent',
+    { short:'Dispatch', who:'human', title:'One click: Dispatch Agent', lane:[0,1],
       desc:'Pick the repo, click <b>Dispatch</b>. This is the last human action until the design is ready to review.',
       enter(anim){
         show('jira');
         const st = $('#dspStatus');
         const okIco = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f883d" stroke-width="2.6" style="flex-shrink:0;margin-top:1px"><path d="M5 12l5 5L20 6"/></svg>';
         const apply = withAnim => {
-          st.innerHTML = '<div class="okban"' + (withAnim?' data-d="1"':'') + '>' + okIco + '<div><b>Dispatched · mode auto</b>GitHub takes it from here.</div></div>' +
-            '<div class="runrow"' + (withAnim?' data-d="2"':'') + '><span class="rundot" style="width:12px;height:12px"></span><span class="rname">Dispatch EN-19042 · auto</span><a style="margin-left:auto;color:var(--gh-link);font-size:11px">Actions →</a></div>';
+          st.innerHTML = '<div class="okban"' + (withAnim?' data-d="1"':'') + '>' + okIco + '<div><b>Dispatched</b>GitHub takes it from here.</div></div>';
           if (withAnim){ st.classList.add('anim'); st.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
         };
         if (anim) clickWith($('#dspGo'), seq, () => apply(true));
         else apply(false);
       } },
 
-    { who:'agent', title:'An agent writes the design',
-      desc:'GitHub launches a Cursor agent in the cloud. It reads the ticket, writes a one-page spec, opens the PR — and <b>stops</b>. No code yet.',
+    { short:'Design', who:'agent', title:'An agent writes the design', lane:[2,3],
+      desc:'GitHub launches a Cursor agent in the cloud. It reads the ticket, writes a one-page design, opens the PR — and <b>stops</b>. No code yet.',
       enter(anim){
         show('cursor');
         const c = $('#ccard');
@@ -1171,15 +1208,15 @@
         c.className = 'ccard ' + (anim ? 'anim' : 'noanim');
       } },
 
-    { who:'auto', title:'The spec PR is ready — Jira pings you',
+    { short:'Spec PR', who:'auto', title:'The design PR is ready — Jira pings you', lane:[3,2],
       desc:'A comment lands on the ticket the moment the PR opens. <b>You get pulled in exactly when needed — not before.</b>',
       enter(anim){
         show('spec', anim ? 'jira' : null);
-        jiraComment({ name:'Automation for Jira', badge:'rule',
+        jiraComment({ name:'Automation for Jira',
           text:'Spec PR ready for review — merge it to green-light the implementation: <a>PR #481</a>' }, false);
       } },
 
-    { who:'human', title:'Approve the design',
+    { short:'Approve', who:'human', title:'Approve the design', lane:[0,2],
       desc:'Read one page. Fix what\'s off. <b>Merge = approved.</b> Minutes here save hours of reviewing wrong code later.',
       enter(anim){
         show('spec');
@@ -1188,7 +1225,7 @@
         else apply();
       } },
 
-    { who:'agent', title:'An agent builds it — and proves it',
+    { short:'Build', who:'agent', title:'An agent builds it — and proves it', lane:[2,3],
       desc:'The merge automatically launches a second agent. It writes the tests first, builds the feature, and <b>verifies every criterion on the running app</b> before opening the PR.',
       enter(anim){
         show('cursor');
@@ -1197,16 +1234,16 @@
         c.className = 'ccard ' + (anim ? 'anim' : 'noanim');
       } },
 
-    { who:'auto', title:'The PR arrives with its proof — Jira moves to Code Review',
-      desc:'Green checks, and the <b>evidence in the PR itself</b>: how each criterion was verified live. The ticket updates on its own.',
+    { short:'Proof', who:'auto', title:'The PR arrives with its proof', lane:[3,2],
+      desc:'Green checks, and the <b>evidence in the PR itself</b>: how each criterion was verified live. The ticket moves to <b>Code Review</b> on its own.',
       enter(anim){
         show('pr', anim ? 'jira' : null);
-        jiraComment({ name:'Automation for Jira', badge:'rule',
+        jiraComment({ name:'Automation for Jira',
           text:'Implementation PR ready for review: <a>PR #482</a> · status → <b>Code Review</b>' }, false);
         setStatus('Code Review', 'prog', false);
       } },
 
-    { who:'human', title:'Review & merge',
+    { short:'Review', who:'human', title:'Review & merge', lane:[0,2],
       desc:'The second and final gate: read the code, check the proof, merge. <b>Nothing ships without an engineer\'s judgement.</b>',
       enter(anim){
         show('pr');
@@ -1215,18 +1252,18 @@
         else apply(false);
       } },
 
-    { who:'auto', title:'Done — the loop closes itself',
+    { short:'Done', who:'auto', title:'Done — the loop closes itself', lane:[2,1],
       desc:'The ticket moves to <b>Done</b> on its own. Total human effort: <b>a ticket, a click, two reviews.</b> Everything else was agents and automation.',
       enter(anim){
         show('jira');
-        jiraComment({ name:'Automation for Jira', badge:'rule',
+        jiraComment({ name:'Automation for Jira',
           text:'Implementation PR merged · status → <b>Done</b>' }, anim);
         setStatus('Done', 'done', anim);
         ['#ac1','#ac2','#ac3'].forEach(s => $(s).classList.add('acdone'));
       } },
   ];
 
-  /* ============ RESET + APPLY ============ */
+  /* ============ RESET ============ */
   function resetScene(){
     $('#jiraComments').innerHTML = '';
     $('#dspStatus').innerHTML = '';
@@ -1234,34 +1271,28 @@
     setStatus('To Do', '', false);
     ['#ac1','#ac2','#ac3'].forEach(s => $(s).classList.remove('acdone'));
     $('#ccard').innerHTML = '';
-    // spec PR back to open
-    const ss = $('#specState');
-    ss.className = 'pr-state';
-    ss.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9c0 7-12 3-12 6"/></svg> Open';
-    const sf = $('#specMergeFoot');
-    sf.innerHTML = '<button class="btn-merge">Merge pull request</button><span class="fnote">You\'re approving the design before any code is written.</span>';
-    $('#specMergeBox').classList.remove('anim');
-    const ps = $('#prState');
-    ps.className = 'pr-state';
-    ps.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9c0 7-12 3-12 6"/></svg> Open';
-    const pf = $('#prMergeFoot');
-    pf.innerHTML = '<button class="btn-merge">Merge pull request</button><span class="fnote">You\'ve read the code and checked the evidence — this is the final gate.</span>';
-    $('#prMergeBox').classList.remove('anim');
+    const openSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v12"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><path d="M18 9c0 7-12 3-12 6"/></svg> Open';
+    const ss = $('#specState'); ss.className = 'pr-state'; ss.innerHTML = openSvg;
+    $('#specMergeFoot').innerHTML = '<button class="btn-merge">Merge pull request</button><span class="fnote">You\'re approving the design — before any code exists.</span>';
+    const ps = $('#prState'); ps.className = 'pr-state'; ps.innerHTML = openSvg;
+    $('#prMergeFoot').innerHTML = '<button class="btn-merge">Merge pull request</button><span class="fnote">The final gate: your judgement, on verified work.</span>';
   }
-  $('#specMergeFoot').dataset.after = 'The spec is on main — implementation starts automatically.';
-  $('#prMergeFoot').dataset.after  = 'Shipped. EN-19042 moves to Done on its own.';
+  $('#specMergeFoot').dataset.after = 'The design is approved — the build starts automatically.';
+  $('#prMergeFoot').dataset.after  = 'Shipped. The ticket moves to Done on its own.';
 
   const whoLabel = { human:'Engineer', auto:'Automation', agent:'AI Agent' };
   let i = 0;
 
-  const dotsWrap = $('#fdots');
+  /* side panel step list */
+  const list = $('#spSteps');
   steps.forEach((s, n) => {
     const d = document.createElement('div');
-    d.className = 'fdot' + (s.who === 'human' ? ' hu' : '');
+    d.className = 'sp-step';
+    d.innerHTML = '<span class="n">' + (n+1) + '</span><span>' + s.short + '</span><span class="adot ' + s.who + '"></span>';
     d.addEventListener('click', () => go(n));
-    dotsWrap.appendChild(d);
+    list.appendChild(d);
   });
-  const dots = Array.from(dotsWrap.children);
+  const items = Array.from(list.children);
 
   function go(n){
     n = Math.max(0, Math.min(steps.length - 1, n));
@@ -1273,19 +1304,50 @@
     Object.values(views).forEach(v => v.scrollTop = 0);
     for (let k = 0; k <= i; k++) steps[k].enter(k === i && forward);
     const s = steps[i];
-    $('#snum').textContent = i + 1;
     const w = $('#swho'); w.className = 'who ' + s.who; w.textContent = whoLabel[s.who];
-    $('#stitle').textContent = s.title;
+    $('#stitle').textContent = (i+1) + '. ' + s.title;
     $('#sdesc').innerHTML = s.desc;
-    $('#fcount').textContent = (i + 1) + ' / ' + steps.length;
-    dots.forEach((d, k) => d.classList.toggle('on', k === i));
+    items.forEach((d, k) => d.classList.toggle('on', k === i));
     $('#backBtn').disabled = i === 0;
     $('#nextBtn').disabled = i === steps.length - 1;
+    dgRows.forEach((r, k) => r.classList.toggle('on', k === i));
   }
+
+  /* ============ SEQUENCE DIAGRAM ============ */
+  const CX = [12.5, 37.5, 62.5, 87.5]; // lifeline centers, %
+  const wrap = $('#dgWrap');
+  // lifelines
+  CX.forEach(x => {
+    const l = document.createElement('div');
+    l.className = 'dg-life';
+    l.style.left = x + '%';
+    wrap.appendChild(l);
+  });
+  const dgRows = steps.map((s, n) => {
+    const [a, b] = s.lane;
+    const x1 = CX[a], x2 = CX[b];
+    const left = Math.min(x1, x2), width = Math.abs(x2 - x1);
+    const row = document.createElement('div');
+    row.className = 'dg-row' + (s.who === 'human' ? ' hu' : '');
+    row.innerHTML =
+      '<span class="dg-lab" style="left:' + (left + width/2) + '%"><span class="stepno">' + (n+1) + '</span>' + s.title + '</span>' +
+      '<span class="dg-arr ' + s.who + ' ' + (x2 > x1 ? 'dir-r' : 'dir-l') + '" style="left:' + left + '%;width:' + width + '%"></span>';
+    row.addEventListener('click', () => { closeDg(); go(n); });
+    wrap.appendChild(row);
+    return row;
+  });
+  const dg = $('#diagram');
+  function openDg(){ dg.classList.add('open'); }
+  function closeDg(){ dg.classList.remove('open'); }
+  $('#diagBtn').addEventListener('click', openDg);
+  $('#dgClose').addEventListener('click', closeDg);
+  dg.addEventListener('click', e => { if (e.target === dg) closeDg(); });
 
   $('#backBtn').addEventListener('click', () => go(i - 1));
   $('#nextBtn').addEventListener('click', () => go(i + 1));
   document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeDg(); return; }
+    if (dg.classList.contains('open')) return;
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(i + 1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); go(i - 1); }
     else if (e.key === 'Home') go(0);
