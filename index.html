@@ -776,6 +776,9 @@
              display:flex;align-items:center;justify-content:space-between;color:var(--jira-text);font-weight:500}
   .dsp .go{flex:1;display:inline-flex;align-items:center;justify-content:center;background:var(--jira-blue);color:#fff;border:none;
            font-size:13px;font-weight:600;padding:9px 0;border-radius:8px;cursor:default;font-family:'Inter'}
+  .dsp .ta{border:1px solid var(--jira-border);border-radius:8px;padding:9px 11px;font-size:12.5px;color:#8a93a6;
+           margin-top:12px;min-height:44px;line-height:1.5;background:#fff}
+  .dsp .ta.filled{color:var(--jira-text)}
   .dsp .okban{display:flex;gap:9px;align-items:flex-start;background:#dcfff1;border:1px solid #a6f0cf;border-radius:9px;
               padding:10px 12px;font-size:12px;color:#216e4e;line-height:1.5;margin-top:12px}
   .dsp .okban b{display:block;color:#164b35}
@@ -928,6 +931,8 @@
           <div class="dsp-body">
             <div class="lblx">Repository</div>
             <span class="rchip">RadixInc/radix-platform ✕</span>
+            <div class="lblx" style="margin-top:12px">Instructions</div>
+            <div class="ta" id="dspTa">Optional instructions and guidance for the agent</div>
             <div class="selrow">
               <div class="drop">auto <span style="opacity:.5">▾</span></div>
               <button class="go" id="dspGo">Dispatch</button>
@@ -1212,13 +1217,16 @@
       enter(){ show('jira'); } },
 
     { short:'Dispatch', who:'human', title:'One click: Dispatch Agent', lane:[0,1],
-      desc:'Pick the repo, click <b>Dispatch</b>. This is the last human action until the design is ready to review.',
+      desc:'Pick the repo, optionally add <b>instructions</b> to guide the agent, click <b>Dispatch</b>. Last human action until the design is ready to review.',
       enter(anim){
         show('jira');
         const st = $('#dspStatus');
         const okIco = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f883d" stroke-width="2.6" style="flex-shrink:0;margin-top:1px"><path d="M5 12l5 5L20 6"/></svg>';
+        const ta = $('#dspTa');
+        ta.textContent = 'The export util already exists in toCsv.ts — reuse it.';
+        ta.classList.add('filled');
         const apply = withAnim => {
-          st.innerHTML = '<div class="okban"' + (withAnim?' data-d="1"':'') + '>' + okIco + '<div><b>Dispatched</b>GitHub takes it from here.</div></div>';
+          st.innerHTML = '<div class="okban"' + (withAnim?' data-d="1"':'') + '>' + okIco + '<div><b>Dispatched</b>GitHub takes it from here — instructions ride along.</div></div>';
           if (withAnim){ st.classList.add('anim'); st.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
         };
         if (anim) clickWith($('#dspGo'), seq, () => apply(true));
@@ -1303,6 +1311,7 @@
     $('#jiraComments').innerHTML = '';
     $('#dspStatus').innerHTML = '';
     $('#dspStatus').classList.remove('anim');
+    const _ta = $('#dspTa'); _ta.textContent = 'Optional instructions and guidance for the agent'; _ta.classList.remove('filled');
     setStatus('To Do', '', false);
     ['#ac1','#ac2','#ac3'].forEach(s => $(s).classList.remove('acdone'));
     $('#ccard').innerHTML = '';
