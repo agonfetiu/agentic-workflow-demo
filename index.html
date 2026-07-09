@@ -797,11 +797,22 @@
   /* confetti */
   .cfp{position:fixed;top:-14px;width:9px;height:15px;z-index:99;animation:cfall linear forwards}
   @keyframes cfall{to{transform:translateY(105vh) rotate(660deg)}}
+  /* animated demo mouse pointer */
+  .mpointer{position:fixed;left:50%;top:70%;z-index:120;width:26px;height:26px;pointer-events:none;opacity:0;
+            transition:left 1s cubic-bezier(.35,.75,.25,1), top 1s cubic-bezier(.35,.75,.25,1), opacity .25s;
+            filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
+  .mpointer.show{opacity:1}
+  .mpointer svg{position:relative;z-index:2}
+  .mpointer.click svg{animation:mpress .35s ease}
+  @keyframes mpress{0%{transform:scale(1)}40%{transform:scale(.78)}100%{transform:scale(1)}}
+  .mpointer .ring{position:absolute;left:-9px;top:-9px;width:44px;height:44px;border-radius:50%;border:3px solid #0c66e4;opacity:0;z-index:1}
+  .mpointer.click .ring{animation:mring .55s ease-out}
+  @keyframes mring{0%{opacity:.85;transform:scale(.35)}100%{opacity:0;transform:scale(1.25)}}
 </style>
 
 <div class="stepbar">
   <span class="snum" id="snum">1</span>
-  <span class="who human" id="swho">🧑 Engineer</span>
+  <span class="who human" id="swho">Engineer</span>
   <span class="stitle" id="stitle">The ticket</span>
   <span class="sdesc" id="sdesc">…</span>
 </div>
@@ -861,6 +872,21 @@
             <div class="ac" id="ac2"><span class="box"></span><span>AC-2 — CSV reflects the current filters, date range &amp; comparison set</span></div>
             <div class="ac" id="ac3"><span class="box"></span><span>AC-3 — Filename format: <code>benchmark_{portfolio}_{date}.csv</code></span></div>
           </div>
+
+          <div class="panel dsp" id="dspPanel" style="margin:24px 0 8px">
+            <div class="panel-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="#0c66e4" style="vertical-align:-2px;margin-right:2px"><path d="M13 2L4.9 12.5H11L9.8 22l8.6-11.5H12z"/></svg> Dispatch Agent</div>
+            <div style="padding:12px 14px;font-size:12.5px;color:var(--jira-sub);line-height:1.5" id="dspBody">
+              Launch a Cursor cloud agent for this ticket through the GitHub agentic flow.
+              <div class="lblx">Repositories</div>
+              <div class="msel"><span class="rchip">RadixInc/radix-platform ✕</span></div>
+              <div class="selrow" style="max-width:420px">
+                <div class="drop">auto <span style="opacity:.5">▾</span></div>
+                <button class="go" id="dspGo">Dispatch</button>
+              </div>
+              <div id="dspStatus"></div>
+            </div>
+          </div>
+
           <div class="activity">
             <div class="activity-head"><h3 class="sec-label" style="margin:0">Activity</h3><div class="tabs"><button>All</button><button class="on">Comments</button><button>History</button></div></div>
             <div class="cmt-input"><div class="av me">AF</div><div class="field">Add a comment…</div></div>
@@ -868,20 +894,7 @@
           </div>
         </div>
         <div class="jira-side">
-          <div class="panel dsp" id="dspPanel">
-            <div class="panel-head">⚡ Dispatch Agent</div>
-            <div style="padding:12px 14px;font-size:12.5px;color:var(--jira-sub);line-height:1.5" id="dspBody">
-              Launch a Cursor cloud agent for this ticket through the GitHub agentic flow.
-              <div class="lblx">Repositories</div>
-              <div class="msel"><span class="rchip">RadixInc/radix-platform ✕</span></div>
-              <div class="selrow">
-                <div class="drop">auto <span style="opacity:.5">▾</span></div>
-                <button class="go" id="dspGo">Dispatch</button>
-              </div>
-              <div id="dspStatus"></div>
-            </div>
-          </div>
-          <div class="panel" style="margin-top:14px">
+          <div class="panel">
             <div class="panel-head">Details</div>
             <div class="field-row"><span class="k">Assignee</span><span class="v"><span class="av-sm none">?</span> Unassigned</span></div>
             <div class="field-row" style="border-top:1px solid var(--jira-border)"><span class="k">Reporter</span><span class="v"><span class="av-sm me">AF</span> Agon Fetiu</span></div>
@@ -994,12 +1007,12 @@
         </div>
 
         <div class="mdtitle">## Acceptance evidence <span style="font-weight:500;font-size:12px;color:#59636e">— in the PR body · verified on the running app · no evidence files in the repo</span></div>
-        <div class="evnote">🤖 <span><b>From the agent's sandbox:</b> real API + web served against live read-only data, driven by Playwright. Every AC exercised end-to-end before this PR was opened.</span></div>
+        <div class="evnote"><span style="flex-shrink:0;width:20px;height:20px;border-radius:5px;background:#0b0b0f;display:grid;place-items:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span><span><b>From the agent's sandbox:</b> real API + web served against live read-only data, driven by Playwright. Every AC exercised end-to-end before this PR was opened.</span></div>
         <table class="evtable">
           <tr><th>AC</th><th>How it was verified in the running app</th><th>Result</th></tr>
-          <tr><td>AC-1</td><td>Loaded the benchmark widget as a read-only user — Export button rendered in the header</td><td>✅ PASS</td></tr>
-          <tr><td>AC-2</td><td>Applied filters + date range, exported — CSV rows matched the filtered view exactly</td><td>✅ PASS</td></tr>
-          <tr><td>AC-3</td><td>Exported "Skyline REIT" on 2026-07-08 → <code style="font-family:var(--mono);font-size:11px">benchmark_skyline-reit_2026-07-08.csv</code></td><td>✅ PASS</td></tr>
+          <tr><td>AC-1</td><td>Loaded the benchmark widget as a read-only user — Export button rendered in the header</td><td>PASS</td></tr>
+          <tr><td>AC-2</td><td>Applied filters + date range, exported — CSV rows matched the filtered view exactly</td><td>PASS</td></tr>
+          <tr><td>AC-3</td><td>Exported "Skyline REIT" on 2026-07-08 → <code style="font-family:var(--mono);font-size:11px">benchmark_skyline-reit_2026-07-08.csv</code></td><td>PASS</td></tr>
         </table>
 
         <div class="filebox" style="margin-top:16px">
@@ -1050,6 +1063,10 @@
 </div>
 
 <div class="keyhint"><b>←</b> <b>→</b> also work</div>
+<div class="mpointer" id="mpointer">
+  <span class="ring"></span>
+  <svg width="26" height="26" viewBox="0 0 24 24"><path d="M5.5 3.2v16.4l4.3-4.2 2.5 5.7 2.7-1.2-2.5-5.6 6-.6z" fill="#111" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+</div>
 <div class="reset" onclick="location.reload()">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.7 3M3 4v5h5"/></svg>
   Restart
@@ -1097,6 +1114,33 @@
     if (anim){ btn.classList.add('statuspulse'); setTimeout(()=>btn.classList.remove('statuspulse'), 1700); }
   }
 
+  /* ---- the visible demo mouse: travels to a button, clicks it, then the result applies ---- */
+  let seq = 0;
+  const ptr = $('#mpointer');
+  function clickWith(target, tok, onClick){
+    if (!target){ onClick(); return; }
+    target.scrollIntoView({ block:'center', behavior:'instant' });
+    requestAnimationFrame(() => {
+      if (tok !== seq) return;
+      const r = target.getBoundingClientRect();
+      ptr.style.transition = 'none';
+      ptr.style.left = (r.left + r.width/2 + 170) + 'px';
+      ptr.style.top  = (r.top + r.height/2 + 150) + 'px';
+      void ptr.offsetWidth;
+      ptr.style.transition = '';
+      ptr.classList.add('show');
+      requestAnimationFrame(() => { requestAnimationFrame(() => {
+        if (tok !== seq) return;
+        ptr.style.left = (r.left + r.width/2 - 4) + 'px';
+        ptr.style.top  = (r.top + r.height/2 - 2) + 'px';
+      });});
+      setTimeout(() => { if (tok !== seq) return; ptr.classList.add('click'); }, 1150);
+      setTimeout(() => { if (tok !== seq) return; onClick(); }, 1420);
+      setTimeout(() => { if (tok !== seq) return; ptr.classList.remove('show','click'); }, 2100);
+    });
+  }
+  function hidePtr(){ ptr.classList.remove('show','click'); }
+
   const RUN_DISPATCH =
     '<h1 class="pr-title" style="font-size:19px">Dispatch EN-19042 · auto <span class="num">run #1204</span></h1>' +
     '<div class="runcard"><div class="rhead"><span class="rundot"></span><div><div class="rt">launch-triage-agent</div><div class="rs">triggered by repository_dispatch · from the Jira panel</div></div></div>' +
@@ -1118,9 +1162,9 @@
     : '<div class="wrow" data-d="' + d + '"><span class="wok2">' + okSvg + '</span>' + inner + '</div>';
 
   const CUR_TRIAGE =
-    '<div class="cchrome"><span class="cd">▮</span> Triage EN-19042 <span class="live"><i></i> cloud sandbox</span></div>' +
+    '<div class="cchrome"><span class="cd"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span> Triage EN-19042 <span class="live"><i></i> cloud sandbox</span></div>' +
     '<div class="cctx">radix-platform · AGENTS.md loaded · spec_mode=auto → Story ⇒ spec-first, no implementation</div>' +
-    '<div class="cmsgc"><span class="cavat">▮</span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">EN-19042 is a <b>Story</b> with no spec on <b>main</b> — per AGENTS.md this is a spec-first deliverable. I write the design and <b>stop before any code</b>.</div></div></div>' +
+    '<div class="cmsgc"><span class="cavat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">EN-19042 is a <b>Story</b> with no spec on <b>main</b> — per AGENTS.md this is a spec-first deliverable. I write the design and <b>stop before any code</b>.</div></div></div>' +
     '<div class="cwork2">' +
     wrow(1, '<span>Read the Jira ticket — the <b>what</b> and the <b>why</b></span>') +
     wrow(2, '<span>Study the codebase — widget, selectors, existing CSV utils</span>') +
@@ -1129,9 +1173,9 @@
     '</div>';
 
   const CUR_IMPL =
-    '<div class="cchrome"><span class="cd">▮</span> Implement EN-19042 <span class="live"><i></i> cloud sandbox</span></div>' +
+    '<div class="cchrome"><span class="cd"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span> Implement EN-19042 <span class="live"><i></i> cloud sandbox</span></div>' +
     '<div class="cctx">approved spec: specs/EN-19042/spec.md · real API + web + read-only data in the sandbox</div>' +
-    '<div class="cmsgc"><span class="cavat">▮</span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">The design is approved. I build it <b>test-first</b> and prove it on the <b>running app</b> — if it does not pass here, it never reaches a human.</div></div></div>' +
+    '<div class="cmsgc"><span class="cavat"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v10l9 5 9-5V7z" stroke="#fff" stroke-width="1.6"/><path d="M12 2v20M3 7l9 5 9-5" stroke="#fff" stroke-width="1.6" opacity=".7"/></svg></span><div class="cbody"><div class="cn">Cursor Agent</div><div class="ct">The design is approved. I build it <b>test-first</b> and prove it on the <b>running app</b> — if it does not pass here, it never reaches a human.</div></div></div>' +
     '<div class="cwork2">' +
     wrow(1, '<span>TDD — one failing test per AC: <code>it(\'AC-1: …\')</code></span>') +
     wrow(2, '<span>Implement — <code>ExportButton</code>, <code>toCsv</code>, wiring</span>') +
@@ -1170,13 +1214,18 @@
       enter(){ show('jira'); } },
 
     { who:'human', title:'One click: Dispatch Agent',
-      desc:'Repo + mode picked, <b>Dispatch</b> clicked — and that\'s it. This is the last human action until the design is ready to review.',
+      desc:'The engineer picks the repo + mode and clicks <b>Dispatch</b> — and that\'s it. This is the last human action until the design is ready to review.',
       enter(anim){
         show('jira');
         const st = $('#dspStatus');
-        st.innerHTML = '<div class="okban"' + (anim?' data-d="1"':'') + '><span>✅</span><div><b>Dispatched · mode auto</b>GitHub takes it from here.</div></div>' +
-          '<div class="runrow"' + (anim?' data-d="2"':'') + '><span class="rundot" style="width:12px;height:12px"></span><span class="rname">Dispatch EN-19042 · auto</span><a style="margin-left:auto;color:var(--gh-link);font-size:11px">Actions →</a></div>';
-        if (anim) st.classList.add('anim');
+        const okIco = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1f883d" stroke-width="2.6" style="flex-shrink:0;margin-top:1px"><path d="M5 12l5 5L20 6"/></svg>';
+        const apply = withAnim => {
+          st.innerHTML = '<div class="okban"' + (withAnim?' data-d="1"':'') + '>' + okIco + '<div><b>Dispatched · mode auto</b>GitHub takes it from here.</div></div>' +
+            '<div class="runrow"' + (withAnim?' data-d="2"':'') + '><span class="rundot" style="width:12px;height:12px"></span><span class="rname">Dispatch EN-19042 · auto</span><a style="margin-left:auto;color:var(--gh-link);font-size:11px">Actions →</a></div>';
+          if (withAnim){ st.classList.add('anim'); st.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
+        };
+        if (anim) clickWith($('#dspGo'), seq, () => apply(true));
+        else apply(false);
       } },
 
     { who:'auto', title:'GitHub validates & launches',
@@ -1202,15 +1251,16 @@
       enter(anim){
         show('spec', anim ? 'jira' : null);
         jiraComment({ name:'Automation for Jira', badge:'rule',
-          text:'📝 Spec PR ready for review — review it, then <b>merge to green-light the implementation</b>: <a>PR #481</a>' }, false);
+          text:'Spec PR ready for review — review it, then <b>merge to green-light the implementation</b>: <a>PR #481</a>' }, false);
       } },
 
     { who:'human', title:'Gate 1 — approve the design',
       desc:'The engineer reads the one-page spec, fixes or challenges anything that\'s off, and merges. <b>The merge is the approval</b> — minutes spent here save hours of reviewing wrong code later.',
       enter(anim){
         show('spec');
-        setMerged($('#specState'), $('#specMergeFoot'));
-        if (anim) $('#specMergeBox').classList.add('anim');
+        const apply = () => { setMerged($('#specState'), $('#specMergeFoot')); };
+        if (anim) clickWith($('#specMergeFoot').querySelector('.btn-merge'), seq, apply);
+        else apply();
       } },
 
     { who:'auto', title:'The merge triggers the builder',
@@ -1242,7 +1292,7 @@
       enter(anim){
         show('jira');
         jiraComment({ name:'Automation for Jira', badge:'rule',
-          text:'🚀 Implementation PR ready for review: <a>PR #482</a> · status → <b>Code Review</b>' }, anim);
+          text:'Implementation PR ready for review: <a>PR #482</a> · status → <b>Code Review</b>' }, anim);
         setStatus('Code Review', 'prog', anim);
       } },
 
@@ -1250,8 +1300,9 @@
       desc:'The engineer reads a small, spec-shaped diff where every AC cites its test and its live verification. The review is <b>verification, not archaeology</b>. Merge when it\'s right; comment and push back when it isn\'t.',
       enter(anim){
         show('pr');
-        setMerged($('#prState'), $('#prMergeFoot'));
-        if (anim){ $('#prMergeBox').classList.add('anim'); confetti(); }
+        const apply = withAnim => { setMerged($('#prState'), $('#prMergeFoot')); if (withAnim) confetti(); };
+        if (anim) clickWith($('#prMergeFoot').querySelector('.btn-merge'), seq, () => apply(true));
+        else apply(false);
       } },
 
     { who:'auto', title:'Ticket → Done. Loop closed.',
@@ -1259,7 +1310,7 @@
       enter(anim){
         show('jira');
         jiraComment({ name:'Automation for Jira', badge:'rule',
-          text:'✅ Implementation PR merged · status → <b>Done</b>' }, anim);
+          text:'Implementation PR merged · status → <b>Done</b>' }, anim);
         setStatus('Done', 'done', anim);
         ['#ac1','#ac2','#ac3'].forEach(s => $(s).classList.add('acdone'));
       } },
@@ -1291,7 +1342,7 @@
   $('#specMergeFoot').dataset.after = 'The spec is on main — implementation starts automatically.';
   $('#prMergeFoot').dataset.after  = 'Shipped. EN-19042 moves to Done on its own.';
 
-  const whoLabel = { human:'🧑 Engineer', auto:'⚙️ Automation', agent:'🤖 AI Agent' };
+  const whoLabel = { human:'Engineer', auto:'Automation', agent:'AI Agent' };
   let i = 0;
 
   const dotsWrap = $('#fdots');
@@ -1307,7 +1358,10 @@
     n = Math.max(0, Math.min(steps.length - 1, n));
     const forward = n >= i;
     i = n;
+    seq++;
+    hidePtr();
     resetScene();
+    Object.values(views).forEach(v => v.scrollTop = 0);
     for (let k = 0; k <= i; k++) steps[k].enter(k === i && forward);
     const s = steps[i];
     $('#snum').textContent = i + 1;
@@ -1318,7 +1372,6 @@
     dots.forEach((d, k) => d.classList.toggle('on', k === i));
     $('#backBtn').disabled = i === 0;
     $('#nextBtn').disabled = i === steps.length - 1;
-    views[Object.keys(views).find(k => views[k].classList.contains('active'))].scrollTop = 0;
   }
 
   $('#backBtn').addEventListener('click', () => go(i - 1));
