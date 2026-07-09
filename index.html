@@ -814,6 +814,8 @@
   .anim [data-d]{opacity:0;animation:slideIn .45s ease both}
   .anim [data-d="1"]{animation-delay:.15s}.anim [data-d="2"]{animation-delay:.5s}
   .anim [data-d="3"]{animation-delay:.9s}.anim [data-d="4"]{animation-delay:1.3s}
+  .anim [data-d="5"]{animation-delay:1.8s}.anim [data-d="6"]{animation-delay:2.4s}
+  .anim [data-d="7"]{animation-delay:3s}.anim [data-d="8"]{animation-delay:3.6s}
   .anim .sw .sp{animation:swHide .1s linear both;animation-delay:var(--t,2.2s)}
   .anim .sw .ck{opacity:0;animation:swShow .25s ease both;animation-delay:var(--t,2.2s)}
   .noanim .sw .sp{display:none}
@@ -857,6 +859,17 @@
   .who-mini.human{background:#fff3d6;color:#8a5d00;border:1px solid #f0d492}
   .who-mini.agent{background:#f3f0ff;color:#5e4db2;border:1px solid #ddd3f7}
   .who-mini.auto{background:#e9f2ff;color:#0055cc;border:1px solid #cfe0f5}
+  /* ---- in-flow local terminal (Refine step) ---- */
+  .browser{position:relative}
+  .flowterm{position:absolute;inset:0;z-index:60;display:none;align-items:center;justify-content:center;
+            background:rgba(15,20,35,.45);backdrop-filter:blur(1.5px)}
+  .flowterm.show{display:flex}
+  .flowterm .tcard{width:min(680px,88%);background:#0d1117;color:#e6edf3;border:1px solid #22282f;border-radius:13px;
+                   overflow:hidden;box-shadow:0 40px 100px -30px rgba(0,0,0,.75)}
+  .flowterm .thead{display:flex;align-items:center;gap:9px;padding:11px 16px;background:#161b22;
+                   border-bottom:1px solid #22282f;font-family:var(--mono);font-size:12px;font-weight:700}
+  .flowterm .thead i{width:10px;height:10px;border-radius:50%;display:block}
+  .specq.resolved{background:#dcfff1;border-color:#a6f0cf;color:#216e4e}
   /* ---- generic popup ---- */
   .pop{position:fixed;inset:0;background:rgba(18,26,46,.6);z-index:210;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
   .pop.open{display:flex}
@@ -1025,15 +1038,12 @@
             <div class="specac"><b>AC-1</b><span>Export button visible for every role, incl. read-only.</span></div>
             <div class="specac"><b>AC-2</b><span>The CSV reflects the active filters and date range.</span></div>
             <div class="specac"><b>AC-3</b><span>File named <code style="font-family:var(--mono);font-size:11.5px">benchmark_{portfolio}_{date}.csv</code>.</span></div>
-            <div class="sc-t" style="margin-top:15px;font-size:13px">Open questions <span style="font-weight:500;color:#8a93a6;font-size:11.5px">— the agent asks, the engineer answers</span></div>
-            <div class="specq">Q1 — Should the export include columns hidden in the current view?</div>
+            <div class="sc-t" style="margin-top:15px;font-size:13px">Open questions <span style="font-weight:500;color:#8a93a6;font-size:11.5px">— the agent asks, the engineer decides</span></div>
+            <div id="specQs">
+              <div class="specq">Q1 — Generate the CSV client-side from the loaded rows, or stream it from the BFF for large portfolios?</div>
+              <div class="specq">Q2 — Reuse the benchmark module&#8217;s toCsv util, or promote it to libs/shared for other widgets?</div>
+            </div>
           </div>
-        </div>
-
-        <div class="resolvebar" id="resolveBar" style="display:none">
-          <span><b>Resolve the question before you approve</b> — two ways:</span>
-          <button id="optGh">Edit on GitHub</button>
-          <button id="optLocal">Answer with a local agent</button>
         </div>
         <div class="merge-box" id="specMergeBox">
           <div class="merge-row">
@@ -1108,6 +1118,24 @@
     </div>
 
   </div>
+
+  <!-- local terminal — the Refine step -->
+  <div class="flowterm" id="flowTerm">
+    <div class="tcard">
+      <div class="thead"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>&nbsp; Terminal — local machine · ~/radix-platform</div>
+      <div class="termbody" id="flowTermBody">
+        <div class="tl p" data-d="1">~/radix-platform $ git checkout spec/EN-19042 &amp;&amp; claude</div>
+        <div class="tl you" data-d="2">&gt; answer the open questions in specs/EN-19042/spec.md with me</div>
+        <div class="tl ag" data-d="3">Agent — Q1: generate the CSV client-side, or stream it from the BFF for large portfolios?</div>
+        <div class="tl you" data-d="4">&gt; client-side — the export is bounded by the visible view, no BFF work needed</div>
+        <div class="tl ag" data-d="5">Agent — Q2: reuse the benchmark module&#8217;s toCsv util, or promote it to libs/shared?</div>
+        <div class="tl you" data-d="6">&gt; keep it in the module — promote only when a second consumer appears</div>
+        <div class="tl ag" data-d="7">Agent — recording both decisions in the spec, closing the questions, committing…</div>
+        <div class="tl okl" data-d="8">✓ pushed — the spec PR now carries the decisions</div>
+      </div>
+      <div class="pcap" style="color:#8b949e">Preparing the design is engineering work too — the spec is refined locally, with an agent, then the PR updates.</div>
+    </div>
+  </div>
 </div>
 
 <div class="sidepanel">
@@ -1154,40 +1182,6 @@
   </div>
 </div>
 
-
-<!-- popup: edit the spec directly on GitHub -->
-<div class="pop gh" id="popGh">
-  <div class="pcard">
-    <div class="phead">specs/EN-19042/spec.md — editing on the spec PR branch<button class="pclose" data-close="popGh">✕</button></div>
-    <div class="ghedit">
-      <div class="l">## Acceptance Criteria</div>
-      <div class="l del">- **AC-2**: The CSV reflects the active filters and date range.</div>
-      <div class="l addl">- **AC-2**: The CSV reflects the active filters and date range,</div>
-      <div class="l addl">  exporting exactly the columns visible in the current view.</div>
-      <div class="l">&nbsp;</div>
-      <div class="l del">## Open questions</div>
-      <div class="l del">Q1 — Should the export include columns hidden in the current view?</div>
-    </div>
-    <div class="ghfoot"><button class="cbtn">Commit changes</button><span>commits straight to the PR branch — the diff updates instantly</span></div>
-    <div class="pcap">Small clarification? The spec is just a file in the PR — edit it right on GitHub, then merge.</div>
-  </div>
-</div>
-
-<!-- popup: answer the questions in a local agent session -->
-<div class="pop term" id="popLocal">
-  <div class="pcard">
-    <div class="phead">Terminal — ~/radix-platform<button class="pclose" data-close="popLocal">✕</button></div>
-    <div class="termbody" id="termBody">
-      <div class="tl p" data-d="1">~/radix-platform (spec branch) $ claude</div>
-      <div class="tl you" data-d="1">&gt; resolve the open questions in specs/EN-19042/spec.md with me</div>
-      <div class="tl ag" data-d="2">Agent — Q1: should the export include columns hidden in the current view?</div>
-      <div class="tl you" data-d="3">&gt; no — export exactly what the view shows</div>
-      <div class="tl ag" data-d="4">Agent — got it. Clarifying AC-2, removing the question, committing…</div>
-      <div class="tl okl" data-d="4">✓ pushed to the spec PR — the diff now carries your answers</div>
-    </div>
-    <div class="pcap">Bigger questions? Pull the branch and work them through with an agent locally — preparing the spec is engineering work too. Push, and the PR updates.</div>
-  </div>
-</div>
 
 <div class="keyhint"><b>←</b> <b>→</b> also work</div>
 <div class="mpointer" id="mpointer">
@@ -1398,25 +1392,34 @@
       } },
 
     { short:'Spec PR', who:'auto', title:'The design PR is ready — Jira pings you', lane:[3,2],
-      desc:'A comment lands on the ticket the moment the PR opens. <b>You get pulled in exactly when needed — not before.</b>',
+      desc:'A comment lands on the ticket the moment the PR opens. The design carries <b>two open architecture questions</b> the agent could not decide alone.',
       enter(anim){
         show('spec', anim ? 'jira' : null);
         jiraComment({ name:'Automation for Jira',
           text:'Spec PR ready for review — merge it to green-light the implementation: <a>PR #481</a>' }, false);
       } },
 
-    { short:'Approve', who:'human', title:'Approve the design', lane:[0,2],
-      desc:'Read one page, resolve the open questions — <b>edit on GitHub</b> for small fixes, or <b>answer them with a local agent</b> (try the two buttons in the view). Then <b>merge = approved</b>.',
+    { short:'Refine', who:'human', title:'Answer the questions — locally, with an agent', lane:[0,3],
+      desc:'The engineer pulls the spec branch and works the questions through in a <b>local agent session</b>. The agent records the decisions in the spec and pushes — the PR updates.',
       enter(anim){
         show('spec');
-        $('#resolveBar').style.display = 'flex';
+        const ft = $('#flowTerm');
+        ft.classList.add('show');
+        const tb = $('#flowTermBody');
+        tb.className = 'termbody ' + (anim ? 'anim' : 'noanim');
+      } },
+
+    { short:'Approve', who:'human', title:'Approve the design', lane:[0,2],
+      desc:'The questions are answered and the spec updated. Read the final design — then <b>merge = approved</b>.',
+      enter(anim){
+        show('spec');
+        $('#specQs').innerHTML = '<div class="specq resolved">Resolved in the local session — decisions recorded in the spec: client-side CSV · util stays in the module</div>';
         const apply = () => { setMerged($('#specState'), $('#specMergeFoot')); };
         if (!anim){ apply(); return; }
         const tok = seq;
-        // let the audience read the spec + open questions before the human merges
         setTimeout(() => { if (tok !== seq) return;
           clickWith($('#specMergeFoot').querySelector('.btn-merge'), tok, apply);
-        }, 1600);
+        }, 1400);
       } },
 
     { short:'Build', who:'agent', title:'An agent builds it — and proves it', lane:[2,3],
@@ -1469,7 +1472,9 @@
     const _ta = $('#dspTa'); _ta.textContent = 'Optional instructions and guidance for the agent'; _ta.classList.remove('filled');
     $('#dspSel').innerHTML = '<span style="color:#8a93a6;font-size:12.5px">Select repositories…</span><span style="color:#8a93a6;font-size:10px">▾</span>';
     $('#dspDrop').classList.remove('open');
-    $('#resolveBar').style.display = 'none';
+    $('#flowTerm').classList.remove('show');
+    $('#specQs').innerHTML = '<div class="specq">Q1 — Generate the CSV client-side from the loaded rows, or stream it from the BFF for large portfolios?</div>' +
+      '<div class="specq">Q2 — Reuse the benchmark module\u2019s toCsv util, or promote it to libs/shared for other widgets?</div>';
     setStatus('To Do', '', false);
     ['#ac1','#ac2','#ac3'].forEach(s => $(s).classList.remove('acdone'));
     $('#ccard').innerHTML = '';
@@ -1506,6 +1511,7 @@
     resetScene();
     Object.values(views).forEach(v => v.scrollTop = 0);
     for (let k = 0; k <= i; k++) steps[k].enter(k === i && forward);
+    $('#flowTerm').classList.toggle('show', steps[i].short === 'Refine');
     const s = steps[i];
     const w = $('#swho'); w.className = 'who ' + s.who; w.textContent = s.wholabel || whoLabel[s.who];
     actorBar.className = 'actorbar ' + s.who;
@@ -1548,26 +1554,11 @@
   $('#dgClose').addEventListener('click', closeDg);
   dg.addEventListener('click', e => { if (e.target === dg) closeDg(); });
 
-  /* resolve-option popups */
-  const pops = { popGh: $('#popGh'), popLocal: $('#popLocal') };
-  function openPop(id){
-    pops[id].classList.add('open');
-    if (id === 'popLocal'){
-      const tb = $('#termBody');
-      tb.classList.remove('anim'); void tb.offsetWidth; tb.classList.add('anim');
-    }
-  }
-  function closePops(){ Object.values(pops).forEach(x => x.classList.remove('open')); }
-  $('#optGh').addEventListener('click', () => openPop('popGh'));
-  $('#optLocal').addEventListener('click', () => openPop('popLocal'));
-  document.querySelectorAll('.pclose').forEach(b => b.addEventListener('click', closePops));
-  Object.values(pops).forEach(x => x.addEventListener('click', e => { if (e.target === x) closePops(); }));
-
   $('#backBtn').addEventListener('click', () => go(i - 1));
   $('#nextBtn').addEventListener('click', () => go(i + 1));
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeDg(); closePops(); return; }
-    if (dg.classList.contains('open') || Object.values(pops).some(x => x.classList.contains('open'))) return;
+    if (e.key === 'Escape') { closeDg(); return; }
+    if (dg.classList.contains('open')) return;
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(i + 1); }
     else if (e.key === 'ArrowLeft') { e.preventDefault(); go(i - 1); }
     else if (e.key === 'Home') go(0);
