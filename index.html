@@ -843,6 +843,20 @@
   .resolvebar button{border:1px solid #d1d9e0;background:#fff;color:#0969da;font-weight:700;font-size:12px;
                      padding:7px 13px;border-radius:8px;cursor:pointer;font-family:'Inter'}
   .resolvebar button:hover{background:#f0f6ff}
+  /* ---- fake select dropdown for the dispatch repo ---- */
+  .dsp .dsp-body{position:relative}
+  .ddown{position:absolute;left:15px;right:15px;margin-top:4px;background:#fff;border:1px solid var(--jira-border);
+         border-radius:9px;box-shadow:0 14px 34px -10px rgba(30,40,70,.3);z-index:20;display:none;overflow:hidden}
+  .ddown.open{display:block;animation:slideIn .18s ease}
+  .dditem{padding:9px 13px;font-size:12.5px;font-family:var(--mono);color:var(--jira-text);cursor:pointer}
+  .dditem:hover, .dditem.hot{background:#e9f2ff;color:#0055cc}
+  .dditem:not(:last-child){border-bottom:1px solid #f1f2f4}
+  /* ---- mini actor chips in the step list ---- */
+  .who-mini{margin-left:auto;font-size:8.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+            padding:2px 8px;border-radius:9px;flex-shrink:0}
+  .who-mini.human{background:#fff3d6;color:#8a5d00;border:1px solid #f0d492}
+  .who-mini.agent{background:#f3f0ff;color:#5e4db2;border:1px solid #ddd3f7}
+  .who-mini.auto{background:#e9f2ff;color:#0055cc;border:1px solid #cfe0f5}
   /* ---- generic popup ---- */
   .pop{position:fixed;inset:0;background:rgba(18,26,46,.6);z-index:210;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
   .pop.open{display:flex}
@@ -971,7 +985,12 @@
           <div class="dsp-head"><svg width="14" height="14" viewBox="0 0 24 24" fill="#0c66e4"><path d="M13 2L4.9 12.5H11L9.8 22l8.6-11.5H12z"/></svg> Dispatch Agent</div>
           <div class="dsp-body">
             <div class="lblx">Repository</div>
-            <div id="dspSel" style="border:1px solid var(--jira-border);border-radius:8px;padding:7px 9px;min-height:36px;display:flex;align-items:center"><span style="color:#8a93a6;font-size:12.5px">Select repositories…</span></div>
+            <div id="dspSel" style="border:1px solid var(--jira-border);border-radius:8px;padding:7px 9px;min-height:36px;display:flex;align-items:center;justify-content:space-between"><span style="color:#8a93a6;font-size:12.5px">Select repositories…</span><span style="color:#8a93a6;font-size:10px">▾</span></div>
+            <div class="ddown" id="dspDrop">
+              <div class="dditem" id="ddFirst">RadixInc/radix-platform</div>
+              <div class="dditem">RadixInc/survey-app-frontend</div>
+              <div class="dditem">RadixInc/RenterPortal</div>
+            </div>
             <div class="lblx" style="margin-top:12px">Instructions</div>
             <div class="ta" id="dspTa">Optional instructions and guidance for the agent</div>
             <div class="selrow">
@@ -1337,18 +1356,26 @@
         };
         if (!anim){ fillRepo(); ta.textContent = NOTE; ta.classList.add('filled'); finish(false); return; }
         const tok = seq;
-        // the human does the work: pick the repo, write the guidance, dispatch
+        const drop = $('#dspDrop');
+        // the human does the work, input by input:
+        // open the repo dropdown -> pick the repo -> write the guidance -> dispatch
         clickWith(sel, tok, () => {
-          fillRepo();
+          drop.classList.add('open');
           setTimeout(() => { if (tok !== seq) return;
-            clickWith(ta, tok, () => {
-              typeText(ta, NOTE, tok, () => {
-                setTimeout(() => { if (tok !== seq) return;
-                  clickWith($('#dspGo'), tok, () => finish(true));
-                }, 400);
-              });
+            clickWith($('#ddFirst'), tok, () => {
+              drop.classList.remove('open');
+              fillRepo();
+              setTimeout(() => { if (tok !== seq) return;
+                clickWith(ta, tok, () => {
+                  typeText(ta, NOTE, tok, () => {
+                    setTimeout(() => { if (tok !== seq) return;
+                      clickWith($('#dspGo'), tok, () => finish(true));
+                    }, 450);
+                  });
+                });
+              }, 450);
             });
-          }, 500);
+          }, 250);
         });
       } },
 
@@ -1384,8 +1411,12 @@
         show('spec');
         $('#resolveBar').style.display = 'flex';
         const apply = () => { setMerged($('#specState'), $('#specMergeFoot')); };
-        if (anim) clickWith($('#specMergeFoot').querySelector('.btn-merge'), seq, apply);
-        else apply();
+        if (!anim){ apply(); return; }
+        const tok = seq;
+        // let the audience read the spec + open questions before the human merges
+        setTimeout(() => { if (tok !== seq) return;
+          clickWith($('#specMergeFoot').querySelector('.btn-merge'), tok, apply);
+        }, 1600);
       } },
 
     { short:'Build', who:'agent', title:'An agent builds it — and proves it', lane:[2,3],
@@ -1411,8 +1442,12 @@
       enter(anim){
         show('pr');
         const apply = withAnim => { setMerged($('#prState'), $('#prMergeFoot')); if (withAnim) confetti(); };
-        if (anim) clickWith($('#prMergeFoot').querySelector('.btn-merge'), seq, () => apply(true));
-        else apply(false);
+        if (!anim){ apply(false); return; }
+        const tok = seq;
+        // pause on the evidence before the final merge
+        setTimeout(() => { if (tok !== seq) return;
+          clickWith($('#prMergeFoot').querySelector('.btn-merge'), tok, () => apply(true));
+        }, 1600);
       } },
 
     { short:'Done', who:'auto', title:'Done — the loop closes itself', lane:[2,1],
@@ -1432,7 +1467,8 @@
     $('#dspStatus').innerHTML = '';
     $('#dspStatus').classList.remove('anim');
     const _ta = $('#dspTa'); _ta.textContent = 'Optional instructions and guidance for the agent'; _ta.classList.remove('filled');
-    $('#dspSel').innerHTML = '<span style="color:#8a93a6;font-size:12.5px">Select repositories…</span>';
+    $('#dspSel').innerHTML = '<span style="color:#8a93a6;font-size:12.5px">Select repositories…</span><span style="color:#8a93a6;font-size:10px">▾</span>';
+    $('#dspDrop').classList.remove('open');
     $('#resolveBar').style.display = 'none';
     setStatus('To Do', '', false);
     ['#ac1','#ac2','#ac3'].forEach(s => $(s).classList.remove('acdone'));
@@ -1454,7 +1490,8 @@
   steps.forEach((s, n) => {
     const d = document.createElement('div');
     d.className = 'sp-step';
-    d.innerHTML = '<span class="n">' + (n+1) + '</span><span>' + s.short + '</span><span class="adot ' + s.who + '"></span>';
+    const miniLabel = { human:'Human', agent:'Agent', auto:'Auto' };
+    d.innerHTML = '<span class="n">' + (n+1) + '</span><span>' + s.short + '</span><span class="who-mini ' + s.who + '">' + miniLabel[s.who] + '</span>';
     d.addEventListener('click', () => go(n));
     list.appendChild(d);
   });
