@@ -218,36 +218,36 @@
       <div>
         <div class="eyebrow"><span class="dot"></span> Shift 01 · Mindset</div>
         <h1>Stop being <span class="accent">“just a programmer.”</span></h1>
+        <p class="lede">Your one new role is <b style="color:var(--ink)">Engineering Manager</b> — leading a team of agents. Inside it, you wear whatever hats the work needs.</p>
       </div>
       <div class="stage">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:clamp(10px,2vh,20px)">
-          <svg class="dgm" style="width:min(940px,90vw)" viewBox="0 0 760 470">
-            <!-- product team -->
-            <rect class="nd" x="250" y="22" width="260" height="58" rx="29"/>
-            <text class="t" x="380" y="58" font-size="20" text-anchor="middle">PRODUCT TEAM</text>
-            <!-- you <-> product -->
-            <line class="ln" x1="380" y1="88" x2="380" y2="166" marker-start="url(#ah)" marker-end="url(#ah)"/>
-            <text class="lbl" x="400" y="122" font-size="13" text-anchor="start">shape the what</text>
-            <text class="lbl" x="400" y="140" font-size="13" text-anchor="start">&amp; the why</text>
-            <!-- YOU -->
-            <circle class="acc" cx="380" cy="232" r="62"/>
-            <text class="tw" x="380" y="242" font-size="29" text-anchor="middle">YOU</text>
-            <!-- fan to agents -->
-            <line class="ln" x1="372" y1="292" x2="212" y2="368" marker-end="url(#ah)"/>
-            <line class="ln" x1="380" y1="294" x2="380" y2="366" marker-end="url(#ah)"/>
-            <line class="ln" x1="388" y1="292" x2="548" y2="368" marker-end="url(#ah)"/>
-            <text class="lbl" x="588" y="316" font-size="13" text-anchor="start">delegate</text>
-            <text class="lbl" x="588" y="334" font-size="13" text-anchor="start">review · own</text>
-            <!-- agents -->
-            <circle class="nd" cx="200" cy="410" r="40"/><text class="t" x="200" y="415" font-size="14" text-anchor="middle">AGENT</text>
-            <circle class="nd" cx="380" cy="410" r="40"/><text class="t" x="380" y="415" font-size="14" text-anchor="middle">AGENT</text>
-            <circle class="nd" cx="560" cy="410" r="40"/><text class="t" x="560" y="415" font-size="14" text-anchor="middle">AGENT</text>
-          </svg>
-          <div class="rolelinks">
-            <span class="rolelink click" data-modal="tpm" style="border-bottom:4px solid var(--accent)">▲ Technical Product Manager<span class="up">↗</span></span>
-            <span class="rolelink click" data-modal="em" style="border-bottom:4px solid var(--accent)">▼ Engineering Manager<span class="up">↗</span></span>
-          </div>
-        </div>
+        <svg class="dgm" style="width:min(1160px,95vw)" viewBox="0 0 960 300">
+          <!-- the new role -->
+          <g class="hit" data-modal="em">
+            <rect class="acc" x="280" y="24" width="400" height="76" rx="38"/>
+            <text class="tw" x="480" y="60" font-size="22" text-anchor="middle">ENGINEERING MANAGER</text>
+            <text class="tw" x="480" y="85" font-size="12.5" text-anchor="middle" opacity=".9">the new role · you lead a team of agents ↗</text>
+          </g>
+          <!-- stem + bus -->
+          <line class="ln" x1="480" y1="100" x2="480" y2="142"/>
+          <line class="ln" x1="175" y1="142" x2="785" y2="142"/>
+          <line class="ln" x1="175" y1="142" x2="175" y2="196" marker-end="url(#ah)"/>
+          <line class="ln" x1="480" y1="142" x2="480" y2="196" marker-end="url(#ah)"/>
+          <line class="ln" x1="785" y1="142" x2="785" y2="196" marker-end="url(#ah)"/>
+          <!-- the hats you wear -->
+          <g class="hit" data-modal="tpm">
+            <rect class="nd" x="25" y="198" width="300" height="66" rx="33"/>
+            <text class="t" x="175" y="237" font-size="16" text-anchor="middle">Technical Product Manager ↗</text>
+          </g>
+          <g class="hit" data-modal="arch">
+            <rect class="nd" x="365" y="198" width="230" height="66" rx="33"/>
+            <text class="t" x="480" y="237" font-size="16" text-anchor="middle">Architect ↗</text>
+          </g>
+          <g class="hit" data-modal="qa">
+            <rect class="nd" x="635" y="198" width="300" height="66" rx="33"/>
+            <text class="t" x="785" y="237" font-size="16" text-anchor="middle">QA / Reviewer ↗</text>
+          </g>
+        </svg>
       </div>
     </section>
 
@@ -393,6 +393,39 @@
       </div>
     </section>
 
+    <!-- WHERE ENERGY GOES -->
+    <section class="slide">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> Shift 05 · Where your energy goes</div>
+        <h1>Automate the work — <span class="accent">don't do it by hand.</span></h1>
+        <p class="lede">The default question stops being “how do I build this?” and becomes “<b style="color:var(--ink)">how do I make this build itself next time?</b>”</p>
+      </div>
+      <div class="stage">
+        <div class="split">
+          <div class="col a">
+            <div class="k">Stop pouring energy into</div>
+            <h2>Manual work.</h2>
+            <ul>
+              <li>Writing the code by hand</li>
+              <li>Opening PRs by hand</li>
+              <li>Testing &amp; validating by hand</li>
+              <li>Wiring the same things up each time</li>
+            </ul>
+          </div>
+          <div class="col b">
+            <div class="k">Pour it into</div>
+            <h2>Leverage.</h2>
+            <ul>
+              <li>Tweaking &amp; optimizing your AI setup</li>
+              <li>Building flows that do the work for you</li>
+              <li>Automating tests, checks &amp; validation</li>
+              <li>Connecting services so they run themselves</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- LOCAL SETUP -->
     <section class="slide">
       <div>
@@ -509,7 +542,7 @@
   <div style="display:none">
 
     <div id="src-tpm">
-      <div class="meyebrow">Shift 01 · Role one</div>
+      <div class="meyebrow">Shift 01 · A hat you wear</div>
       <h2>Technical Product Manager</h2>
       <p class="msub">Facing <b>up</b> — toward the product team. You stop being an order-taker and start co-owning the product.</p>
       <h4>What it asks of you</h4>
@@ -524,9 +557,9 @@
     </div>
 
     <div id="src-em">
-      <div class="meyebrow">Shift 01 · Role two</div>
+      <div class="meyebrow">Shift 01 · The new role</div>
       <h2>Engineering Manager</h2>
-      <p class="msub">Facing <b>down</b> — toward your agents. They are your team members; you are their lead.</p>
+      <p class="msub">The umbrella role. Your agents are your team; you are their lead — and you wear whatever hats the work needs beneath it.</p>
       <h4>What it asks of you</h4>
       <ul>
         <li><span class="mk">→</span> Coordinate the whole effort — break work down, delegate to agents, sequence it.</li>
@@ -536,6 +569,30 @@
       </ul>
       <h4>The mental model</h4>
       <p>You wouldn't hand-write everything if you managed five engineers. You'd lead them. <b>Same here — the team just happens to be agents.</b></p>
+    </div>
+
+    <div id="src-arch">
+      <div class="meyebrow">Shift 01 · A hat you wear</div>
+      <h2>Architect</h2>
+      <p class="msub">You own the shape of the service — the design decisions, not just the code.</p>
+      <h4>What it asks of you</h4>
+      <ul>
+        <li><span class="mk">→</span> Decide the structure and the trade-offs; capture the big calls as ADRs.</li>
+        <li><span class="mk">→</span> Think in blast radius and migration paths, not just the next change.</li>
+        <li><span class="mk">→</span> Set the patterns your agents follow — the harness encodes them.</li>
+      </ul>
+    </div>
+
+    <div id="src-qa">
+      <div class="meyebrow">Shift 01 · A hat you wear</div>
+      <h2>QA / Reviewer</h2>
+      <p class="msub">You own the quality bar. The agents produce; you decide what's good enough to ship.</p>
+      <h4>What it asks of you</h4>
+      <ul>
+        <li><span class="mk">→</span> Turn acceptance criteria into tests — every AC has a tagged test.</li>
+        <li><span class="mk">→</span> Review agent output critically; their PRs are your PRs.</li>
+        <li><span class="mk">→</span> Read the acceptance evidence before you merge — the gate is the floor, not the ceiling.</li>
+      </ul>
     </div>
 
     <div id="src-own">
