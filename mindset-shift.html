@@ -340,38 +340,41 @@
     <section class="slide">
       <div>
         <div class="eyebrow"><span class="dot"></span> Pillar 3 · Automation <span class="mat">Piloting → rolling out</span></div>
-        <h1>Let the machine do the <span class="accent">toil.</span></h1>
+        <h1>The cloud flow carries <span class="accent">most of the work.</span></h1>
       </div>
       <div class="stage">
-        <svg class="dgm" style="width:min(1020px,94vw)" viewBox="0 0 1000 430">
+        <svg class="dgm" style="width:min(1020px,94vw)" viewBox="0 0 1000 440">
           <!-- start -->
-          <circle class="nd" cx="92" cy="215" r="52"/><text class="t" x="92" y="222" font-size="18" text-anchor="middle">WORK</text>
+          <circle class="nd" cx="92" cy="220" r="52"/><text class="t" x="92" y="227" font-size="18" text-anchor="middle">TICKET</text>
           <!-- branch -->
-          <line class="ln" x1="140" y1="196" x2="224" y2="120" marker-end="url(#ah)"/>
-          <line class="ln" x1="140" y1="234" x2="224" y2="310" marker-end="url(#ah)"/>
+          <line class="ln" x1="140" y1="200" x2="216" y2="120" marker-end="url(#ah)"/>
+          <line class="ln" x1="140" y1="242" x2="221" y2="316" marker-end="url(#ah)"/>
+          <text class="lbl" x="118" y="150" font-size="12" text-anchor="start">most</text>
+          <text class="lbl" x="118" y="300" font-size="12" text-anchor="start">the few</text>
 
-          <!-- TOIL LANE (cy 112) -->
-          <text class="cl" x="316" y="52" font-size="16" text-anchor="middle" data-modal="toil">TOIL — bugs &amp; small, automated ↗</text>
-          <rect class="nd" x="228" y="83" width="164" height="58" rx="29"/><text class="t" x="310" y="118" font-size="16" text-anchor="middle">Radix Flows</text>
-          <line class="ln" x1="392" y1="112" x2="418" y2="112" marker-end="url(#ah)"/>
-          <rect class="acc" x="420" y="83" width="172" height="58" rx="29"/><text class="tw" x="506" y="118" font-size="16" text-anchor="middle">Cloud agent</text>
-          <line class="ln" x1="592" y1="112" x2="620" y2="112" marker-end="url(#ah)"/>
-          <rect class="nd" x="622" y="83" width="82" height="58" rx="29"/><text class="t" x="663" y="118" font-size="16" text-anchor="middle">PR</text>
-          <line class="ln" x1="704" y1="112" x2="732" y2="112" marker-end="url(#ah)"/>
-          <rect class="nd" x="734" y="83" width="176" height="58" rx="29"/><text class="t" x="822" y="118" font-size="16" text-anchor="middle">You review</text>
+          <!-- CLOUD LANE (primary · cy 112) -->
+          <text class="cl" x="470" y="46" font-size="16" text-anchor="middle" data-modal="cloud">MOST WORK — bugs &amp; spec'd stories, via the cloud ↗</text>
+          <rect class="nd" x="220" y="83" width="170" height="58" rx="29"/><text class="t" x="305" y="118" font-size="16" text-anchor="middle">Radix Flows</text>
+          <text class="lbl" x="305" y="162" font-size="11.5" text-anchor="middle">see &amp; edit the spec · merge · dispatch</text>
+          <line class="ln" x1="390" y1="112" x2="438" y2="112" marker-end="url(#ah)"/>
+          <text class="lbl" x="414" y="100" font-size="11" text-anchor="middle">dispatch</text>
+          <rect class="acc" x="440" y="83" width="160" height="58" rx="29"/><text class="tw" x="520" y="118" font-size="16" text-anchor="middle">Cloud agent</text>
+          <line class="ln" x1="600" y1="112" x2="650" y2="112" marker-end="url(#ah)"/>
+          <rect class="nd" x="652" y="83" width="76" height="58" rx="29"/><text class="t" x="690" y="118" font-size="16" text-anchor="middle">PR</text>
+          <line class="ln" x1="728" y1="112" x2="778" y2="112" marker-end="url(#ah)"/>
+          <rect class="nd" x="780" y="83" width="170" height="58" rx="29"/><text class="t" x="865" y="118" font-size="16" text-anchor="middle">You review</text>
 
-          <!-- COMPLEX LANE (cy 318) -->
-          <rect class="nd" x="228" y="289" width="164" height="58" rx="29"/><text class="t" x="310" y="324" font-size="16" text-anchor="middle">Spec first</text>
-          <line class="ln" x1="392" y1="318" x2="418" y2="318" marker-end="url(#ah)"/>
-          <rect class="acc" x="420" y="289" width="172" height="58" rx="29"/><text class="tw" x="506" y="324" font-size="16" text-anchor="middle">You + agent</text>
-          <line class="ln" x1="592" y1="318" x2="620" y2="318" marker-end="url(#ah)"/>
-          <rect class="nd" x="622" y="289" width="82" height="58" rx="29"/><text class="t" x="663" y="324" font-size="16" text-anchor="middle">PR</text>
-          <line class="ln" x1="704" y1="318" x2="732" y2="318" marker-end="url(#ah)"/>
-          <rect class="nd" x="734" y="289" width="176" height="58" rx="29"/><text class="t" x="822" y="324" font-size="16" text-anchor="middle">You own it</text>
-          <text class="cl" x="316" y="392" font-size="16" text-anchor="middle" data-modal="complex">COMPLEX — decisions, you + agents ↗</text>
+          <!-- HANDS-ON LANE (minority · cy 326) -->
+          <rect class="acc" x="225" y="297" width="210" height="58" rx="29"/><text class="tw" x="330" y="332" font-size="16" text-anchor="middle">You + local agent</text>
+          <text class="lbl" x="330" y="376" font-size="11.5" text-anchor="middle">hands-on when real decisions are needed</text>
+          <line class="ln" x1="435" y1="326" x2="505" y2="326" marker-end="url(#ah)"/>
+          <rect class="nd" x="507" y="297" width="76" height="58" rx="29"/><text class="t" x="545" y="332" font-size="16" text-anchor="middle">PR</text>
+          <line class="ln" x1="583" y1="326" x2="653" y2="326" marker-end="url(#ah)"/>
+          <rect class="nd" x="655" y="297" width="160" height="58" rx="29"/><text class="t" x="735" y="332" font-size="16" text-anchor="middle">You own it</text>
+          <text class="cl" x="470" y="418" font-size="16" text-anchor="middle" data-modal="complex">COMPLEX — the few you handle hands-on ↗</text>
         </svg>
       </div>
-      <div class="foot"><span class="fn">3</span><p>Two reasons: <b>kill developer toil</b>, and <b>keep yourself busy with the bigger things</b>. <b>Radix Flows</b> is where you manage your ticket flows — the small stuff runs itself so your attention goes where it matters.</p></div>
+      <div class="foot"><span class="fn">3</span><p><b>Radix Flows is your cockpit</b> — see and edit the spec, do the work, merge, then dispatch a cloud agent. Most tickets, <b>bugs and spec'd stories alike</b>, never need a local checkout. You only go hands-on with a local agent for the complex few that need real decisions.</p></div>
     </section>
 
     <!-- 7 — PILLAR 4: NEW DAY-TO-DAY -->
@@ -425,7 +428,7 @@
         <div class="mrows">
           <div class="mrow"><span class="mn">01</span><span class="mt"><b>Install the standards kit</b> in your service repo — <code>bin/sync</code>. It gets its harness, gates, and dispatch flow.</span></div>
           <div class="mrow"><span class="mn">02</span><span class="mt"><b>Write your <code>AGENTS.md</code> &amp; <code>CONTEXT.md</code></b> — teach your agents your service: mission, stack, domain language.</span></div>
-          <div class="mrow"><span class="mn">03</span><span class="mt"><b>Move your bugs &amp; small tickets into Radix Flows</b> — let the toil lane run so your attention goes to the bigger things.</span></div>
+          <div class="mrow"><span class="mn">03</span><span class="mt"><b>Run your tickets from Radix Flows</b> — review/edit the spec, merge, and dispatch cloud agents. Go hands-on locally only for the complex few.</span></div>
           <div class="mrow"><span class="mn">04</span><span class="mt"><b>Spend one hour improving a single flow</b> — a prompt, a spec, a gate. Then do it again next week. Compounding is the whole game.</span></div>
         </div>
       </div>
@@ -530,34 +533,33 @@
       </ul>
     </div>
 
-    <div id="src-toil">
-      <div class="meyebrow">Pillar 3 · Automation · Toil lane</div>
-      <h2>The toil lane — automated</h2>
-      <p class="msub">Bugs and small, well-scoped tickets flow to cloud agents so you don't spend your day on them.</p>
+    <div id="src-cloud">
+      <div class="meyebrow">Pillar 3 · Automation · The cloud flow</div>
+      <h2>The cloud flow — most of the work</h2>
+      <p class="msub">Bugs <b>and spec'd stories alike</b>. You run the whole thing from <b>Radix Flows</b> and dispatch cloud agents — you rarely open a local checkout.</p>
       <h4>How it flows</h4>
       <ul>
-        <li><span class="mk">1</span> A bug or small ticket lands and is managed in <b>Radix Flows</b> — your ticket-flow hub.</li>
-        <li><span class="mk">2</span> It's dispatched to a <b>cloud agent</b> (Dispatch Agent → <code>repository_dispatch</code> → Cursor cloud agent).</li>
-        <li><span class="mk">3</span> The agent works it — for bugs, a failing repro test named with the key comes first, then the fix — and opens a PR.</li>
+        <li><span class="mk">1</span> A ticket lands in <b>Radix Flows</b> — your cockpit for the entire flow.</li>
+        <li><span class="mk">2</span> Needs a spec? <b>You review and edit the spec right there, then merge it</b> — that merge is the approval gate.</li>
+        <li><span class="mk">3</span> You <b>dispatch a cloud agent</b> (<code>repository_dispatch</code> → Cursor cloud agent); it implements and opens a PR. For bugs, a failing repro test named with the key comes first.</li>
         <li><span class="mk">4</span> <b>You review and merge.</b> CI and the traceability gate have already run.</li>
       </ul>
-      <h4>Why</h4>
-      <p>Two reasons: <b>reduce developer toil</b>, and <b>keep your attention on the bigger things</b> — not the small, repetitive fixes. Piloting on a few repos today, rolling out to the rest.</p>
+      <h4>Why this is the default</h4>
+      <p>Most tickets — even ones with a spec — never need you in an editor. Radix Flows plus cloud agents carry them, so your attention is free for the work that actually needs judgment.</p>
     </div>
 
     <div id="src-complex">
-      <div class="meyebrow">Pillar 3 · Automation · Complex lane</div>
-      <h2>The complex lane — you + agents</h2>
-      <p class="msub">The work that needs judgment stays with you. Agents amplify you; they don't replace the decision.</p>
+      <div class="meyebrow">Pillar 3 · Automation · Hands-on</div>
+      <h2>Hands-on — the complex few</h2>
+      <p class="msub">The minority of tickets that need real decisions or architecture. Here you work directly with a <b>local agent</b>.</p>
       <h4>How it flows</h4>
       <ul>
-        <li><span class="mk">1</span> A hard problem — new capability, cross-cutting change, real trade-offs.</li>
-        <li><span class="mk">2</span> <b>Spec first.</b> You make the calls and write (or direct) an EARS spec. Merging the spec PR is the approval gate.</li>
-        <li><span class="mk">3</span> You build <b>with</b> your agents — the spec-merge auto-dispatches implementation on pilot repos; you steer and review.</li>
-        <li><span class="mk">4</span> <b>You own the outcome.</b> This is where your engineering judgment earns its keep.</li>
+        <li><span class="mk">1</span> A genuinely complex change — new capability, cross-cutting design, real trade-offs.</li>
+        <li><span class="mk">2</span> You work <b>with a local agent</b> (Claude Code, Cursor) in your checkout, spec-first, making the calls as you go.</li>
+        <li><span class="mk">3</span> You open the PR and <b>own the outcome.</b> This is where your engineering judgment earns its keep.</li>
       </ul>
-      <h4>The split, in one line</h4>
-      <p>Automate the decided; own the deciding. The more of the toil lane you set up well, the more time you have for this one.</p>
+      <h4>When to choose it</h4>
+      <p>Only when the decision density is high enough that steering an agent live beats dispatching one. <b>The default is always the cloud flow.</b></p>
     </div>
 
   </div>
