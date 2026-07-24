@@ -185,6 +185,19 @@
   .tree .fn{color:var(--accent);font-weight:700}
   .tree .cm{color:#a2a3ac}
   .tree .dir{color:#b7791f;font-weight:700}
+  .tree .ac{color:var(--accent);font-weight:700}
+
+  /* ---- playbook: sequence diagram inside a modal ---- */
+  .seqhost{margin:16px 0 8px}
+  .seqhost svg{width:100%;height:auto;display:block}
+  .seqlegend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:12px;color:var(--sub);font-weight:600;margin-top:4px}
+  .seqlegend span{display:inline-flex;align-items:center;gap:7px}
+  .seqlegend i{display:inline-block;width:16px;height:0;border-top:2.5px solid var(--ink)}
+  .seqlegend .ev i{border-top-style:dashed;border-top-color:var(--accent)}
+  .seqlegend .ac i{border-top-color:var(--accent)}
+  /* two-up list for compact playbook modals */
+  .modal .cols2{display:grid;grid-template-columns:1fr 1fr;gap:6px 34px}
+  @media(max-width:720px){ .modal .cols2{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
@@ -478,6 +491,26 @@
       </div>
     </section>
 
+    <!-- PLAYBOOK -->
+    <section class="slide">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> The playbook <span class="mat">when you're stuck, start here</span></div>
+        <h1>The <span class="accent">playbook.</span></h1>
+        <p class="lede">Everything the five shifts imply, made concrete — what to install, what to touch, and exactly how a ticket moves from groomed to Done. <b style="color:var(--ink)">Click any row</b> for the detail.</p>
+      </div>
+      <div class="stage">
+        <div class="agenda">
+          <div class="arow" data-modal="pb-setup"><span class="an">01</span><span class="at"><b>Set up your machine</b><span class="ad">GitHub CLI · Claude Code · Cursor CLI · Atlassian MCP</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-modal="pb-repo"><span class="an">02</span><span class="at"><b>Onboard a repo</b><span class="ad">sync the kit · AGENTS.md · CONTEXT.md · environment.json · prerequisites</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-modal="pb-files"><span class="an">03</span><span class="at"><b>What's in your repo — touch / don't touch</b><span class="ad">the files you own vs the machinery you leave alone</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-modal="pb-ticket"><span class="an">04</span><span class="at"><b>A ticket, start → finish</b><span class="ad">two triggers, two merges, everything between automated</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-modal="pb-seq"><span class="an">05</span><span class="at"><b>The full technical sequence</b><span class="ad">every dispatch, workflow &amp; PR — the wiring diagram</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-modal="pb-specs"><span class="an">06</span><span class="at"><b>Specs, the grill workflow &amp; commands</b><span class="ad">/sync-jira · /grill-me · EARS · the cheat-sheet</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-modal="pb-faq"><span class="an">07</span><span class="at"><b>“I'm stuck” — the FAQ</b><span class="ad">the questions people actually ask</span></span><span class="ago">↗</span></div>
+        </div>
+      </div>
+    </section>
+
    </div>
   </div>
 
@@ -629,6 +662,136 @@
       <p>Only when the decision density is high enough that steering an agent live beats dispatching one. <b>The default is always the cloud flow.</b></p>
     </div>
 
+    <!-- ============ PLAYBOOK MODALS ============ -->
+
+    <div id="src-pb-setup">
+      <div class="meyebrow">Playbook · Set up once · per person</div>
+      <h2>Your machine &amp; tools</h2>
+      <p class="msub">Fifteen minutes, once. You need all four even if you dispatch everything from the cloud — half the value is the <b>local agent</b> that shapes specs and grills your plans.</p>
+      <h4>Install</h4>
+      <ul>
+        <li><span class="mk">gh</span><span><b>GitHub CLI</b> — <code>winget install GitHub.cli</code> (or <code>brew install gh</code>), then <code>gh auth login</code>. How you review &amp; merge PRs from the terminal; both local agents shell out to it.</span></li>
+        <li><span class="mk">claude</span><span><b>Claude Code</b> — <code>npm i -g @anthropic-ai/claude-code</code>, then <code>claude</code> in any repo. Your local agent; reads <code>AGENTS.md</code>/<code>CONTEXT.md</code>; runs <code>/sync-jira</code>, <code>/grill-me</code>.</span></li>
+        <li><span class="mk">cursor</span><span><b>Cursor CLI</b> — the cloud-agent driver; sign in so its GitHub integration is wired. The launch key (<code>CURSOR_API_KEY</code>) lives only in the control plane — you never handle it.</span></li>
+        <li><span class="mk">mcp</span><span><b>Atlassian MCP</b> — connect the Rovo MCP (<code>mcp.atlassian.com/v1/mcp/authv2</code>) so the agent reads Jira/Confluence and comments back. Powers <code>/sync-jira</code>.</span></li>
+      </ul>
+      <h4>Done when</h4>
+      <p><code>gh auth status</code> is green, <code>claude</code> launches and shows skills, Cursor is signed in, and your agent can read a Jira ticket.</p>
+    </div>
+
+    <div id="src-pb-repo">
+      <div class="meyebrow">Playbook · Set up once · per repo</div>
+      <h2>Onboard a repo</h2>
+      <p class="msub">A repo has to earn cloud-agent routing — the payoff is real, but only if the agent can actually run the code. In order:</p>
+      <h4>The steps</h4>
+      <ul>
+        <li><span class="mk">1</span><span><b>Sync the kit</b> — <code>bin/sync.ps1</code> / <code>bin/sync.sh</code> from inside the repo. Copies the gates, templates and config; writes <code>.kit-version</code>. Files you've customised get a <code>.kit</code> sibling to diff-and-merge by hand.</span></li>
+        <li><span class="mk">2</span><span><b>Fill <code>AGENTS.md</code></b> — mission, stack, the real build/test commands. Under 80 lines. Let the local agent draft it, then review every line — this file governs everything.</span></li>
+        <li><span class="mk">3</span><span><b>Bootstrap <code>CONTEXT.md</code></b> — run <code>/grill-with-docs</code> against the codebase; approve 20–40 real domain terms. Grow it inline, never batch.</span></li>
+        <li><span class="mk">4</span><span><b>Fill <code>.cursor/environment.json</code></b> — real install/start/test commands, ports, secrets. This is what lets an agent stand the app up and verify.</span></li>
+        <li><span class="mk">5</span><span><b>Prerequisites</b> — the <code>DISPATCH_APP</code> GitHub App (Contents + PRs read/write), the Cursor integration, secrets <code>DISPATCH_APP_ID</code>/<code>_PRIVATE_KEY</code> + <code>ANTHROPIC_API_KEY</code>, and the <code>agentic-dispatch</code> topic. <code>CURSOR_API_KEY</code> lives only in the control plane.</span></li>
+      </ul>
+      <h4>The one that bites</h4>
+      <p><b>Flaky tests.</b> An agent runs the suite 20+ times per ticket — every flake is 20× more expensive. Quarantine or fix flakiness before enabling agents. Non-negotiable.</p>
+    </div>
+
+    <div id="src-pb-files">
+      <div class="meyebrow">Playbook · Your repo after sync</div>
+      <h2>Touch / don't touch</h2>
+      <p class="msub">Hand-editing the machinery is how the guarantees quietly stop holding. Know which is which.</p>
+      <h4>Yours to own</h4>
+      <ul>
+        <li><span class="mk">edit</span><span><b><code>AGENTS.md</code></b> — the rules every agent reads. <code>CLAUDE.md</code> is a one-line shim that imports it.</span></li>
+        <li><span class="mk">edit</span><span><b><code>CONTEXT.md</code></b> — the domain glossary; grow it via <code>/grill-with-docs</code>.</span></li>
+        <li><span class="mk">edit</span><span><b><code>.cursor/environment.json</code></b> — the cloud-agent run recipe.</span></li>
+      </ul>
+      <h4>Generated per ticket — you review &amp; merge</h4>
+      <ul>
+        <li><span class="mk">auto</span><span><b><code>specs/&lt;KEY&gt;/spec.md</code></b> — written by the triage agent (or you via <code>/sync-jira</code>).</span></li>
+      </ul>
+      <h4>Don't touch — the machinery</h4>
+      <ul>
+        <li><span class="mk">lock</span><span><b><code>spec-traceability.yml</code></b> + <code>check-spec-coverage.mjs</code> — the deterministic definition-of-done gate.</span></li>
+        <li><span class="mk">lock</span><span><b><code>ping-implement-on-spec-merge.yml</code></b> — pings the control plane on spec merge (org-portable, keys on the PR title marker).</span></li>
+        <li><span class="mk">lock</span><span><b><code>label-prs.yml</code></b> + <code>labeler.yml</code> — fact-derived labels. <b><code>pull_request_template.md</code></b> — the AC + acceptance-evidence template.</span></li>
+      </ul>
+    </div>
+
+    <div id="src-pb-ticket">
+      <div class="meyebrow">Playbook · A ticket, start → finish</div>
+      <h2>From groomed to Done</h2>
+      <p class="msub">Two triggers in, two human merges, everything between automated.</p>
+      <h4>The loop</h4>
+      <ul>
+        <li><span class="mk">1</span><span><b>Groom to Definition of Ready</b> (PM, in Jira) — Story: EARS acceptance criteria; Bug: repro + expected vs actual; Task: the constraint. No terms missing from <code>CONTEXT.md</code>.</span></li>
+        <li><span class="mk">2</span><span><b>Dispatch</b> — from the <b>Jira Dispatch Agent panel</b> <i>or</i> the <b>Radix Flows</b> app. Both fire the same event at <code>radix-agent-control</code>; pick repos, <code>spec_mode</code>, optional instructions.</span></li>
+        <li><span class="mk">3</span><span><b>Triage agent</b> writes <code>specs/&lt;KEY&gt;/spec.md</code> and opens a <code>&lt;KEY&gt; SPEC: …</code> PR (one per repo).</span></li>
+        <li><span class="mk">4</span><span><b>You review &amp; MERGE the spec PR</b> — approval gate&nbsp;#1 (the developer, not the PM). The merge is the green light.</span></li>
+        <li><span class="mk">5</span><span><b>Completeness check</b> passes → the <b>implementation agent</b> works test-first, boots the real app, and opens a <code>&lt;KEY&gt;: …</code> PR with a <code>## Acceptance evidence</code> section.</span></li>
+        <li><span class="mk">6</span><span><b>You review the evidence &amp; MERGE</b> — approval gate&nbsp;#2.</span></li>
+        <li><span class="mk">7</span><span><b>Jira auto-transitions the ticket to Done.</b> No manual status update.</span></li>
+      </ul>
+      <h4>The one rule to remember</h4>
+      <p>The <b>PR title is the only signal</b> automation trusts — <code>&lt;KEY&gt; SPEC:</code> green-lights implementation, <code>&lt;KEY&gt;:</code> closes the ticket. Branch names carry nothing (cloud agents live on <code>cursor/*</code>).</p>
+    </div>
+
+    <div id="src-pb-seq">
+      <div class="meyebrow">Playbook · The wiring</div>
+      <h2>The full technical sequence</h2>
+      <p class="msub">Both dispatch triggers fire the <i>same</i> <code>repository_dispatch: dispatch-agent</code> at <code>radix-agent-control</code>; from there GitHub orchestrates the rest. This is the map for reasoning about <i>why</i> a run did (or didn't) do something.</p>
+      <div class="seqhost"></div>
+      <div class="seqlegend">
+        <span class="ac ev"><i></i>dashed = async <code>repository_dispatch</code> / write-back</span>
+        <span><i></i>solid = direct action (write · launch · merge)</span>
+        <span>“OR” = the alternative dispatch trigger</span>
+      </div>
+    </div>
+
+    <div id="src-pb-specs">
+      <div class="meyebrow">Playbook · Specs &amp; commands</div>
+      <h2>Specs, the grill workflow &amp; the cheat-sheet</h2>
+      <p class="msub">For one ticket the agent drafts the spec; for a project <i>you</i> shape it, then let the agent fill it in. Same tools either way.</p>
+      <h4>The authoring loop</h4>
+      <ul>
+        <li><span class="mk">→</span><span><code>/grill-with-docs</code> — align the plan to the domain model; update <code>CONTEXT.md</code> / ADRs inline as decisions crystallise.</span></li>
+        <li><span class="mk">→</span><span><code>/sync-jira &lt;KEY&gt;</code> — pull the ticket, draft <code>specs/&lt;KEY&gt;/spec.md</code> in EARS, comment the AC list back to Jira.</span></li>
+        <li><span class="mk">→</span><span><code>/grill-me</code> — get interrogated until every branch resolves. This is how you <b>write and modify</b> specs.</span></li>
+        <li><span class="mk">→</span><span><code>/to-issues</code> · <code>/tdd</code> — slice a project into tickets; red-green-refactor, one failing test per AC.</span></li>
+      </ul>
+      <h4>EARS acceptance criteria</h4>
+      <p>Each AC is one testable statement with a stable ID — <code>AC-1: When &lt;event&gt;, the system shall &lt;response&gt;.</code> IDs never renumber once approved; tests reference them verbatim, and the traceability gate enforces coverage.</p>
+      <h4>Cheat-sheet</h4>
+      <div class="tree"><span class="cm"># onboard a repo</span>
+git clone https://github.com/RadixInc/agentic-standards-kit ../agentic-standards-kit
+pwsh -File ../agentic-standards-kit/bin/<span class="fn">sync.ps1</span>        <span class="cm"># Windows  (sync.sh on Unix)</span>
+
+<span class="cm"># dispatch without the UI — hits the control plane, not the target repo</span>
+gh workflow run <span class="fn">triage-orchestrate.yml</span> -R RadixInc/radix-agent-control \
+  -f ticket_key=EN-1234 -f repos=RadixInc/radix-platform -f spec_mode=auto
+
+<span class="cm"># review &amp; merge</span>
+gh pr create --title <span class="ac">"EN-1234 SPEC: …"</span> --fill   <span class="cm"># spec PR (never --draft)</span>
+gh pr merge --squash
+
+<span class="cm"># PR title grammar — the only signal automation reads</span>
+<span class="ac">EN-1234 SPEC:</span> portfolio CSV export   <span class="cm"># merge = green-light implementation</span>
+<span class="ac">EN-1234:</span> portfolio CSV export        <span class="cm"># merge = ticket Done</span></div>
+    </div>
+
+    <div id="src-pb-faq">
+      <div class="meyebrow">Playbook · When you're stuck</div>
+      <h2>The FAQ</h2>
+      <p class="msub">The questions people actually ask.</p>
+      <ul>
+        <li><span class="mk">Q</span><span><b>Do I merge the agent's PR, or does it self-merge?</b> You merge — always. Two human merges (spec, then impl); agents never merge. Everything between is automated.</span></li>
+        <li><span class="mk">Q</span><span><b>Nothing happened after I merged the spec.</b> Usually a multi-repo ticket — implementation only starts once the spec is on the default branch of <i>every</i> repo. Otherwise check the <code>ping-implement</code> run in your repo and <code>implement-orchestrate</code> in the control plane.</span></li>
+        <li><span class="mk">Q</span><span><b>The spec looks wrong — can I skip it and edit code?</b> No. Fix the <b>spec</b> (re-grill, edit <code>specs/&lt;KEY&gt;/spec.md</code>), then merge. The gate blocks the impl PR without it.</span></li>
+        <li><span class="mk">Q</span><span><b>CI is stuck on a check that never reports.</b> A required check got skipped by a path filter — it must “always run and self-skip” like <code>spec-traceability</code>. Repo-owner fix; don't disable branch protection.</span></li>
+        <li><span class="mk">Q</span><span><b>Cursor: “failed to verify existence of branch.”</b> The control-plane <code>CURSOR_API_KEY</code> isn't a User/Service key, or lacks access to the target repo. Flag the control-plane owner.</span></li>
+        <li><span class="mk">Q</span><span><b>Can I put a screenshot in the PR to prove it works?</b> No — no evidence files in git, anywhere. The acceptance account goes in the PR body; visuals stay in the linked agent run.</span></li>
+      </ul>
+    </div>
+
   </div>
 
 <script>
@@ -681,6 +844,98 @@
     else if (e.key === 'Home') go(0);
     else if (e.key === 'End') go(slides.length - 1);
   });
+
+  /* ---- playbook: technical sequence diagram (deck ink + accent style) ---- */
+  function buildSeqSVG(){
+    const INK='#0a0a0c', ACC='#bf5b26', SUB='#5f6068', FAINT='#a2a3ac', LINE='#e7e7ec';
+    const W=1330;
+    const actors=[
+      {id:'HUM', label:'Human',        sub:'dev / PM'},
+      {id:'JIRA',label:'Jira',         sub:'Dispatch panel'},
+      {id:'FLOW',label:'Radix Flows',  sub:'dispatch app'},
+      {id:'CTL', label:'radix-agent-control', sub:'control plane', star:true},
+      {id:'CUR', label:'Cursor',       sub:'cloud agent'},
+      {id:'REPO',label:'Consuming repo(s)', sub:'Actions + PRs'}
+    ];
+    const idx={}; actors.forEach((a,i)=>idx[a.id]=i);
+    const leftPad=178, gap=208, cx=i=>leftPad+i*gap;
+    const boxW=168, boxH=52, boxY=14, lifeTop=boxY+boxH+8;
+    const steps=[
+      {p:'A', n:1,   from:'HUM', to:'JIRA', label:'open Dispatch Agent panel', tech:'repos[] · spec_mode', kind:'act'},
+      {p:'A', alt:1, from:'HUM', to:'FLOW', label:'— or — dispatch from Radix Flows', tech:'same payload', kind:'act'},
+      {p:'A', n:2,   from:'JIRA',to:'CTL',  label:'repository_dispatch', tech:'type: dispatch-agent', kind:'event'},
+      {p:'A', alt:2, from:'FLOW',to:'CTL',  label:'repository_dispatch', tech:'type: dispatch-agent', kind:'event'},
+      {p:'A', n:3,   from:'CTL', to:'CTL',  label:'triage-orchestrate.yml', tech:'validate · dedup · resolve repos', kind:'self'},
+      {p:'A', n:4,   from:'CTL', to:'CUR',  label:'_launch-cursor-agent.yml', tech:'phase=triage · POST /v1/agents', kind:'act'},
+      {p:'B', n:5,   from:'CUR', to:'REPO', label:'write  specs/<KEY>/spec.md', tech:'reads AGENTS.md + CONTEXT.md', kind:'act'},
+      {p:'B', n:6,   from:'CUR', to:'REPO', label:'open  "<KEY> SPEC: …"  PR', tech:'ready for review · > Repos:', kind:'act'},
+      {p:'B', n:7,   from:'REPO',to:'JIRA', label:'link PR · Rule D comment', kind:'event'},
+      {p:'B', n:8,   from:'HUM', to:'REPO', label:'review + MERGE spec PR', tech:'approval gate #1', kind:'human'},
+      {p:'C', n:9,   from:'REPO',to:'REPO', label:'ping-implement-on-spec-merge.yml', tech:'keys on title marker', kind:'self'},
+      {p:'C', n:10,  from:'REPO',to:'CTL',  label:'repository_dispatch', tech:'type: implement-ticket', kind:'event'},
+      {p:'C', n:11,  from:'CTL', to:'CTL',  label:'implement-orchestrate.yml', tech:'completeness check — spec on default branch of ALL repos?', kind:'self'},
+      {p:'C', n:12,  from:'CTL', to:'CUR',  label:'_launch-cursor-agent.yml', tech:'phase=implement', kind:'act'},
+      {p:'C', n:13,  from:'CUR', to:'CUR',  label:'TDD · boot real app · acceptance-test', tech:'1 failing test per AC', kind:'self'},
+      {p:'C', n:14,  from:'CUR', to:'REPO', label:'open  "<KEY>: …"  PR', tech:'## Acceptance evidence', kind:'act'},
+      {p:'C', n:15,  from:'REPO',to:'REPO', label:'spec-traceability · label-prs · ai-review', kind:'self'},
+      {p:'C', n:16,  from:'REPO',to:'JIRA', label:'Rule E · → Code Review', kind:'event'},
+      {p:'D', n:17,  from:'HUM', to:'REPO', label:'review evidence + MERGE', tech:'approval gate #2', kind:'human'},
+      {p:'D', n:18,  from:'REPO',to:'JIRA', label:'Rule C · → Done', kind:'event'}
+    ];
+    const phases={A:'A · DISPATCH', B:'B · SPEC', C:'C · IMPLEMENT', D:'D · CLOSE'};
+    let y=lifeTop+42;
+    steps.forEach(s=>{ s.top=y;
+      if(s.from===s.to){ s.h=s.tech?52:40; s.y=y+s.h/2; y+=s.h+22; }
+      else { s.h=0; s.y=y; y+=(s.tech?58:50); }
+      s.bot=y-14; });
+    const H=y+16;
+    const esc=t=>String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Inter,Segoe UI,sans-serif">`;
+    svg+=`<defs><marker id="sqi" markerWidth="9" markerHeight="9" refX="7.5" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="${INK}"/></marker>`;
+    svg+=`<marker id="sqa" markerWidth="9" markerHeight="9" refX="7.5" refY="3.2" orient="auto"><path d="M0,0 L8,3.2 L0,6.4 Z" fill="${ACC}"/></marker></defs>`;
+    // phase bands
+    ['A','B','C','D'].forEach(p=>{
+      const inP=steps.filter(s=>s.p===p); const t=inP[0].top-14, b=inP[inP.length-1].bot+6;
+      svg+=`<rect x="130" y="${t}" width="${W-150}" height="${b-t}" rx="12" fill="${ACC}" opacity="0.035"/>`;
+      svg+=`<rect x="130" y="${t}" width="4" height="${b-t}" rx="2" fill="${ACC}" opacity="0.5"/>`;
+      svg+=`<text x="20" y="${t+18}" font-size="11.5" font-weight="800" letter-spacing="0.04em" fill="${FAINT}">${phases[p]}</text>`;
+    });
+    // lifelines + actor boxes
+    actors.forEach((a,i)=>{ const x=cx(i);
+      svg+=`<line x1="${x}" y1="${lifeTop}" x2="${x}" y2="${H-14}" stroke="${LINE}" stroke-width="1.6" stroke-dasharray="3 5"/>`;
+      const fill=a.star?ACC:'#fff', txt=a.star?'#fff':INK, subc=a.star?'#fff':FAINT, op=a.star?' opacity="0.85"':'';
+      svg+=`<rect x="${x-boxW/2}" y="${boxY}" width="${boxW}" height="${boxH}" rx="12" fill="${fill}" stroke="${INK}" stroke-width="2.5"/>`;
+      svg+=`<text x="${x}" y="${boxY+22}" text-anchor="middle" font-size="13.5" font-weight="800" fill="${txt}">${esc(a.label)}</text>`;
+      svg+=`<text x="${x}" y="${boxY+39}" text-anchor="middle" font-size="10.5" font-weight="600" fill="${subc}"${op}>${esc(a.sub)}</text>`;
+    });
+    // messages
+    steps.forEach(s=>{
+      const isEv=(s.kind==='event'||s.alt);
+      const col=isEv?ACC:INK, mk=isEv?'sqa':'sqi', num=s.n;
+      if(s.from===s.to){ const x=cx(idx[s.from]);
+        const bw=Math.min(360, Math.max(215, s.label.length*7.2, (s.tech?s.tech.length*6.4:0)+40));
+        const bx=Math.max(136, Math.min(x-bw/2, W-18-bw)), by=s.top;
+        svg+=`<circle cx="${x}" cy="${by+s.h/2}" r="3.5" fill="${INK}"/>`;
+        svg+=`<rect x="${bx}" y="${by}" width="${bw}" height="${s.h}" rx="9" fill="#fff" stroke="${INK}" stroke-width="2"/>`;
+        svg+=`<circle cx="${bx+15}" cy="${by+15}" r="9" fill="${INK}"/><text x="${bx+15}" y="${by+18.5}" text-anchor="middle" font-size="10" font-weight="800" fill="#fff">${num}</text>`;
+        svg+=`<text x="${bx+31}" y="${by+(s.tech?18:24)}" font-size="12" font-weight="800" fill="${INK}">${esc(s.label)}</text>`;
+        if(s.tech) svg+=`<text x="${bx+31}" y="${by+36}" font-size="10.5" fill="${SUB}" font-family="'JetBrains Mono',monospace">${esc(s.tech)}</text>`;
+      } else {
+        const xa=cx(idx[s.from]), xb=cx(idx[s.to]), dir=xb>xa?1:-1, sx=xa, ex=xb-dir*8, yy=s.y;
+        const dash=isEv?' stroke-dasharray="6 4"':'';
+        svg+=`<line x1="${sx}" y1="${yy}" x2="${ex}" y2="${yy}" stroke="${col}" stroke-width="2.4"${dash} marker-end="url(#${mk})"/>`;
+        if(num!=null){ svg+=`<circle cx="${sx+dir*13}" cy="${yy}" r="9" fill="${col}"/><text x="${sx+dir*13}" y="${yy+3.4}" text-anchor="middle" font-size="10" font-weight="800" fill="#fff">${num}</text>`; }
+        else { svg+=`<rect x="${sx+dir*4-13}" y="${yy-8}" width="26" height="16" rx="8" fill="#fff" stroke="${ACC}" stroke-width="1.4"/><text x="${sx+dir*4}" y="${yy+3.4}" text-anchor="middle" font-size="8.5" font-weight="800" fill="${ACC}">OR</text>`; }
+        const mx=(sx+ex)/2;
+        svg+=`<text x="${mx}" y="${yy-9}" text-anchor="middle" font-size="12" font-weight="${s.kind==='human'?'800':'700'}" fill="${s.kind==='human'?ACC:INK}">${esc(s.label)}</text>`;
+        if(s.tech) svg+=`<text x="${mx}" y="${yy+15}" text-anchor="middle" font-size="10.5" fill="${SUB}" font-family="'JetBrains Mono',monospace">${esc(s.tech)}</text>`;
+      }
+    });
+    svg+='</svg>'; return svg;
+  }
+  const _seqHost = document.querySelector('#src-pb-seq .seqhost');
+  if(_seqHost) _seqHost.innerHTML = buildSeqSVG();
+
   go(0);
 </script>
 </body>
