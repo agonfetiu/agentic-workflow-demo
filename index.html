@@ -802,15 +802,30 @@ gh pr merge --squash
   const track = document.getElementById('track');
   let i = 0;
 
+  // Each slide has its own URL: #/overview, #/mindset, … #/playbook.
+  // Hash-based so it works from file:// and GitHub Pages alike, and the browser
+  // back/forward buttons step through slides.
+  const slugs = ['overview','mindset','ownership','standards','automation',
+                 'day-to-day','local-setup','objections','monday','resources','playbook'];
+  const slugToIndex = h => slugs.indexOf((h || '').replace(/^#\/?/, '').toLowerCase());
+
   function go(n){
     i = Math.max(0, Math.min(slides.length - 1, n));
     track.style.transform = 'translateY(' + (-i * 100) + '%)';
     prog.style.width = ((i + 1) / slides.length * 100) + '%';
     prev.disabled = i === 0;
     next.disabled = i === slides.length - 1;
+    const want = '#/' + (slugs[i] || i);
+    if (location.hash !== want) location.hash = want;   // reflect slide in the URL
   }
   prev.addEventListener('click', () => go(i - 1));
   next.addEventListener('click', () => go(i + 1));
+
+  // React to URL changes (typed address, back/forward, shared deep link).
+  window.addEventListener('hashchange', () => {
+    const k = slugToIndex(location.hash);
+    if (k !== -1 && k !== i) go(k);
+  });
 
   document.querySelectorAll('[data-goto]').forEach(el => {
     el.addEventListener('click', () => go(parseInt(el.getAttribute('data-goto'), 10)));
@@ -936,7 +951,9 @@ gh pr merge --squash
   const _seqHost = document.querySelector('#src-pb-seq .seqhost');
   if(_seqHost) _seqHost.innerHTML = buildSeqSVG();
 
-  go(0);
+  // Open on the slide named in the URL (deep link), else the first slide.
+  const _start = slugToIndex(location.hash);
+  go(_start === -1 ? 0 : _start);
 </script>
 </body>
 </html>
