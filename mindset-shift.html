@@ -22,11 +22,6 @@
     display:flex; flex-direction:column;
   }
 
-  /* ---- top bar ---- */
-  .topbar{display:flex;align-items:center;padding:22px clamp(24px,4vw,56px) 0;flex-shrink:0}
-  .brand{font-weight:800;font-size:13px;letter-spacing:.02em;color:var(--ink)}
-  .brand .b2{color:var(--faint);font-weight:600}
-
   /* ---- deck / slides ---- */
   .deck{flex:1;position:relative;min-height:0}
   .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
@@ -122,8 +117,7 @@
   .mrow .mt code{font-family:var(--mono);font-size:.82em;font-weight:700}
 
   /* ---- nav ---- */
-  .nav{display:flex;align-items:center;justify-content:space-between;padding:12px clamp(24px,4vw,56px) 22px;flex-shrink:0}
-  .counter{font-size:13px;font-weight:800;color:var(--faint);font-variant-numeric:tabular-nums;letter-spacing:.05em}
+  .nav{display:flex;align-items:center;justify-content:flex-end;padding:12px clamp(24px,4vw,56px) 22px;flex-shrink:0}
   .arrows{display:flex;gap:12px}
   .arrow{width:46px;height:46px;border-radius:50%;background:#fff;border:2px solid var(--ink);color:var(--ink);
          display:grid;place-items:center;cursor:pointer;transition:.15s}
@@ -131,8 +125,6 @@
   .arrow:disabled{opacity:.2;cursor:default;background:#fff;color:var(--ink)}
   .arrow svg{width:20px;height:20px}
   .prog{position:fixed;left:0;bottom:0;height:4px;background:var(--accent);width:11%;transition:width .45s cubic-bezier(.2,.9,.3,1)}
-  .hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--faint);font-weight:600}
-  .kbd{font-family:var(--mono);font-size:10.5px;background:#f2f2f5;border:1px solid var(--line);border-radius:5px;padding:2px 6px;color:var(--sub)}
 
   /* ---- modal ---- */
   .overlay{position:fixed;inset:0;background:rgba(255,255,255,.78);backdrop-filter:blur(7px);z-index:50;
@@ -164,16 +156,11 @@
 </style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="brand">THE NEW WAY WE BUILD <span class="b2">· Radix Engineering</span></div>
-  </div>
-
   <div class="deck" id="deck">
 
     <!-- 1 — HOOK -->
     <section class="slide active">
       <div>
-        <div class="eyebrow"><span class="dot"></span> Radix · Engineering</div>
         <h1>The world already changed how software gets built. <span class="accent">Now we do too.</span></h1>
       </div>
       <div class="stage">
@@ -360,7 +347,6 @@
   </div>
 
   <div class="nav">
-    <span class="counter" id="counter">01 / 09</span>
     <div class="arrows">
       <button class="arrow" id="prev" aria-label="Previous">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -371,7 +357,6 @@
     </div>
   </div>
   <div class="prog" id="prog"></div>
-  <div class="hint">Use <span class="kbd">←</span> <span class="kbd">→</span> · click <span class="kbd">↗</span> for detail</div>
 
   <!-- ============ MODAL ============ -->
   <div class="overlay" id="overlay">
@@ -493,15 +478,12 @@
   const slides = Array.from(document.querySelectorAll('.slide'));
   const prev = document.getElementById('prev');
   const next = document.getElementById('next');
-  const counter = document.getElementById('counter');
   const prog = document.getElementById('prog');
   let i = 0;
-  const pad = n => String(n).padStart(2, '0');
 
   function go(n){
     i = Math.max(0, Math.min(slides.length - 1, n));
     slides.forEach((s, k) => s.classList.toggle('active', k === i));
-    counter.textContent = pad(i + 1) + ' / ' + pad(slides.length);
     prog.style.width = ((i + 1) / slides.length * 100) + '%';
     prev.disabled = i === 0;
     next.disabled = i === slides.length - 1;
