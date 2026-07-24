@@ -150,7 +150,7 @@
   .overlay{position:fixed;inset:0;background:rgba(255,255,255,.78);backdrop-filter:blur(7px);z-index:50;
            display:flex;align-items:center;justify-content:center;padding:clamp(20px,4vw,48px);opacity:0;pointer-events:none;transition:opacity .22s}
   .overlay.on{opacity:1;pointer-events:auto}
-  .modal{width:min(860px,94vw);max-height:88vh;overflow:auto;background:#fff;border:2px solid var(--ink);border-radius:18px;
+  .modal{width:min(1200px,96vw);max-height:90vh;overflow:auto;background:#fff;border:2px solid var(--ink);border-radius:18px;
          padding:clamp(24px,3vw,40px);box-shadow:0 50px 120px -30px rgba(0,0,0,.4);
          transform:translateY(16px) scale(.98);transition:transform .26s cubic-bezier(.2,.9,.3,1)}
   .overlay.on .modal{transform:none}
@@ -169,7 +169,7 @@
   .modal li .mk{color:var(--accent);font-weight:800;flex-shrink:0;font-size:13px;min-width:44px;font-family:var(--mono);padding-top:2px}
   .modal li b{font-weight:700}
 
-  .tree{font-family:var(--mono);font-size:13px;line-height:1.95;background:#f6f6f9;border:1px solid var(--line);border-radius:12px;padding:18px 20px;color:#2a2a32;white-space:pre;overflow:auto}
+  .tree{font-family:var(--mono);font-size:15px;line-height:2;background:#f6f6f9;border:1px solid var(--line);border-radius:12px;padding:20px 24px;color:#2a2a32;white-space:pre;overflow:auto}
   .tree .fn{color:var(--accent);font-weight:700}
   .tree .cm{color:#a2a3ac}
   .tree .dir{color:#b7791f;font-weight:700}
