@@ -204,7 +204,7 @@
       </div>
       <div class="stage">
         <div class="agenda">
-          <div class="arow" data-goto="1"><span class="an">01</span><span class="at"><b>Mindset</b><span class="ad">engineer → technical product manager + engineering manager</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-goto="1"><span class="an">01</span><span class="at"><b>Mindset</b><span class="ad">engineer → engineering manager, leading a team of agents</span></span><span class="ago">↗</span></div>
           <div class="arow" data-goto="2"><span class="an">02</span><span class="at"><b>Ownership</b><span class="ad">own a whole service for a period, not a ticket at a time</span></span><span class="ago">↗</span></div>
           <div class="arow" data-goto="3"><span class="an">03</span><span class="at"><b>Standards</b><span class="ad">the agentic harness lives in the repo, for your agents</span></span><span class="ago">↗</span></div>
           <div class="arow" data-goto="4"><span class="an">04</span><span class="at"><b>Automation</b><span class="ad">the cloud flow carries most of the work</span></span><span class="ago">↗</span></div>
@@ -259,30 +259,21 @@
         <p class="lede">Your team lead assigns your focus for a period — roughly three months. For that service, you are everything. <span class="click" data-modal="own" style="font-weight:700;color:var(--ink)">What you own<span class="up">↗</span></span></p>
       </div>
       <div class="stage">
-        <svg class="dgm" style="width:min(1240px,96vw)" viewBox="0 0 900 360">
-          <!-- hats feeding in -->
-          <rect class="nd" x="150" y="34" width="88" height="46" rx="23"/><text class="t" x="194" y="63" font-size="17" text-anchor="middle">PM</text>
-          <rect class="nd" x="278" y="34" width="158" height="46" rx="23"/><text class="t" x="357" y="63" font-size="17" text-anchor="middle">ARCHITECT</text>
-          <rect class="nd" x="468" y="34" width="152" height="46" rx="23"/><text class="t" x="544" y="63" font-size="17" text-anchor="middle">ENGINEER</text>
-          <rect class="nd" x="652" y="34" width="120" height="46" rx="23"/><text class="t" x="712" y="63" font-size="17" text-anchor="middle">OWNER</text>
-          <line class="ln" x1="194" y1="80" x2="194" y2="148" marker-end="url(#ah)"/>
-          <line class="ln" x1="357" y1="80" x2="357" y2="148" marker-end="url(#ah)"/>
-          <line class="ln" x1="544" y1="80" x2="544" y2="148" marker-end="url(#ah)"/>
-          <line class="ln" x1="712" y1="80" x2="712" y2="148" marker-end="url(#ah)"/>
-          <!-- the service bar -->
-          <rect class="nd" x="120" y="150" width="700" height="92" rx="46"/>
-          <text class="t" x="500" y="205" font-size="25" text-anchor="middle">your service — end to end</text>
-          <circle class="acc" cx="170" cy="196" r="52"/><text class="tw" x="170" y="205" font-size="22" text-anchor="middle">YOU</text>
-          <!-- timeline -->
-          <text class="lbl" x="485" y="284" font-size="13" text-anchor="middle">≈ 3-MONTH HORIZON · ONE OWNER</text>
-          <line class="ln" x1="170" y1="300" x2="800" y2="300"/>
-          <line class="ln" x1="170" y1="293" x2="170" y2="307"/>
-          <line class="ln" x1="380" y1="293" x2="380" y2="307"/>
-          <line class="ln" x1="590" y1="293" x2="590" y2="307"/>
-          <line class="ln" x1="800" y1="293" x2="800" y2="307"/>
-          <text class="lbl" x="275" y="330" font-size="14" text-anchor="middle">MONTH 1</text>
-          <text class="lbl" x="485" y="330" font-size="14" text-anchor="middle">MONTH 2</text>
-          <text class="lbl" x="695" y="330" font-size="14" text-anchor="middle">MONTH 3</text>
+        <svg class="dgm" style="width:min(1240px,96vw)" viewBox="0 0 900 240">
+          <!-- the service you own, end to end -->
+          <rect class="nd" x="120" y="34" width="700" height="96" rx="48"/>
+          <text class="t" x="502" y="90" font-size="26" text-anchor="middle">your service — end to end</text>
+          <circle class="acc" cx="172" cy="82" r="54"/><text class="tw" x="172" y="91" font-size="22" text-anchor="middle">YOU</text>
+          <!-- the period -->
+          <text class="lbl" x="486" y="176" font-size="13" text-anchor="middle">≈ 3-MONTH HORIZON · ONE OWNER</text>
+          <line class="ln" x1="172" y1="192" x2="800" y2="192"/>
+          <line class="ln" x1="172" y1="185" x2="172" y2="199"/>
+          <line class="ln" x1="381" y1="185" x2="381" y2="199"/>
+          <line class="ln" x1="590" y1="185" x2="590" y2="199"/>
+          <line class="ln" x1="800" y1="185" x2="800" y2="199"/>
+          <text class="lbl" x="277" y="222" font-size="14" text-anchor="middle">MONTH 1</text>
+          <text class="lbl" x="486" y="222" font-size="14" text-anchor="middle">MONTH 2</text>
+          <text class="lbl" x="695" y="222" font-size="14" text-anchor="middle">MONTH 3</text>
         </svg>
       </div>
     </section>
@@ -361,44 +352,12 @@
       </div>
     </section>
 
-    <!-- 7 — PILLAR 4: NEW DAY-TO-DAY -->
+    <!-- DAY-TO-DAY -->
     <section class="slide">
       <div>
         <div class="eyebrow"><span class="dot"></span> Shift 05 · The new day-to-day</div>
         <h1>Your job is the <span class="accent">flow</span>, not the PR.</h1>
-        <p class="lede">Your day is a loop you keep sharpening — not a queue you grind. If you're working the way you did a year ago, <b style="color:var(--ink)">you're already behind.</b></p>
-      </div>
-      <div class="stage">
-        <svg class="dgm" style="width:min(1120px,94vw)" viewBox="0 0 960 500">
-          <!-- center -->
-          <text class="t" x="480" y="242" font-size="30" text-anchor="middle">YOUR DAY</text>
-          <text class="lbl" x="480" y="272" font-size="15" text-anchor="middle">a loop you sharpen — not a queue</text>
-          <!-- nodes (clockwise loop) -->
-          <rect class="acc" x="330" y="34" width="300" height="58" rx="29"/><text class="tw" x="480" y="69" font-size="17" text-anchor="middle">Set the context &amp; standards</text>
-          <rect class="nd" x="700" y="221" width="230" height="58" rx="29"/><text class="t" x="815" y="256" font-size="17" text-anchor="middle">Work with agents</text>
-          <rect class="nd" x="345" y="408" width="270" height="58" rx="29"/><text class="t" x="480" y="443" font-size="17" text-anchor="middle">Review the output</text>
-          <rect class="acc" x="30" y="221" width="230" height="58" rx="29"/><text class="tw" x="145" y="256" font-size="17" text-anchor="middle">Sharpen the flow</text>
-          <!-- clockwise curved arrows -->
-          <path class="ln" d="M636 74 Q800 96 812 216" marker-end="url(#ah)"/>
-          <path class="ln" d="M812 284 Q800 404 621 430" marker-end="url(#ah)"/>
-          <path class="ln" d="M345 432 Q150 404 148 284" marker-end="url(#ah)"/>
-          <path class="ln" d="M158 216 Q170 96 324 74" marker-end="url(#ah)"/>
-          <!-- arrow captions -->
-          <text class="lbl" x="742" y="150" font-size="12.5" text-anchor="middle">agents build</text>
-          <text class="lbl" x="700" y="372" font-size="12.5" text-anchor="middle">you read &amp; learn</text>
-          <text class="lbl" x="214" y="372" font-size="12.5" text-anchor="middle">tighten prompts,</text>
-          <text class="lbl" x="214" y="388" font-size="12.5" text-anchor="middle">specs, gates</text>
-          <text class="lbl" x="244" y="150" font-size="12.5" text-anchor="middle">better next time</text>
-        </svg>
-      </div>
-    </section>
-
-    <!-- WHERE ENERGY GOES -->
-    <section class="slide">
-      <div>
-        <div class="eyebrow"><span class="dot"></span> Shift 05 · Where your energy goes</div>
-        <h1>Automate the work — <span class="accent">don't do it by hand.</span></h1>
-        <p class="lede">The default question stops being “how do I build this?” and becomes “<b style="color:var(--ink)">how do I make this build itself next time?</b>”</p>
+        <p class="lede">Stop asking “how do I build this?” — ask “<b style="color:var(--ink)">how do I make this build itself next time?</b>” Working like you did a year ago means you're already behind.</p>
       </div>
       <div class="stage">
         <div class="split">
@@ -431,7 +390,7 @@
       <div>
         <div class="eyebrow"><span class="dot"></span> Your local setup</div>
         <h1>For the hands-on work, <span class="accent">live in the terminal.</span></h1>
-        <p class="lede">The cloud flow runs in Radix Flows. When you <i>do</i> go hands-on — shaping specs, the complex few, sharpening your flows — the terminal beats a heavy IDE.</p>
+        <p class="lede">When you go hands-on — shaping specs, the complex few, sharpening your flows — the terminal beats a heavy IDE.</p>
       </div>
       <div class="stage">
         <div class="split">
@@ -493,7 +452,7 @@
       </div>
       <div class="stage">
         <div class="mrows">
-          <div class="mrow"><span class="mn">01</span><span class="mt"><b>Install the standards kit</b> in your service repo — <code>bin/sync</code>. It gets its harness, gates, and dispatch flow.</span></div>
+          <div class="mrow"><span class="mn">01</span><span class="mt"><b>Install the standards kit</b> in your service repo — <code>bin/sync</code>. It gets its harness and CI gates.</span></div>
           <div class="mrow"><span class="mn">02</span><span class="mt"><b>Write your <code>AGENTS.md</code> &amp; <code>CONTEXT.md</code></b> — teach your agents your service: mission, stack, domain language.</span></div>
           <div class="mrow"><span class="mn">03</span><span class="mt"><b>Run your tickets from Radix Flows</b> — review/edit the spec, merge, and dispatch cloud agents. Go hands-on locally only for the complex few.</span></div>
           <div class="mrow"><span class="mn">04</span><span class="mt"><b>Spend one hour improving a single flow</b> — a prompt, a spec, a gate. Then do it again next week. Compounding is the whole game.</span></div>
@@ -598,18 +557,17 @@
 
     <div id="src-own">
       <div class="meyebrow">Shift 02 · Ownership</div>
-      <h2>What you own for the period</h2>
-      <p class="msub">For roughly three months, one service is yours. You wear every hat.</p>
-      <h4>The hats</h4>
+      <h2>What owning a service means</h2>
+      <p class="msub">For a period — roughly three months — one service is yours, end to end.</p>
+      <h4>You own</h4>
       <ul>
-        <li><span class="mk">PM</span> The roadmap and priorities — what gets built and in what order.</li>
-        <li><span class="mk">ARCH</span> The architecture — the design decisions, captured as ADRs.</li>
-        <li><span class="mk">ENG</span> The implementation — driven with your agent team, spec-first.</li>
-        <li><span class="mk">QA</span> The quality bar — specs, tests, and the acceptance evidence that proves it works.</li>
-        <li><span class="mk">OPS</span> The outcomes — you own what ships and how it behaves in production.</li>
+        <li><span class="mk">→</span> The roadmap — what gets built, and in what order.</li>
+        <li><span class="mk">→</span> The architecture and the quality bar.</li>
+        <li><span class="mk">→</span> The outcomes — what ships and how it behaves in production.</li>
+        <li><span class="mk">→</span> The agents doing the work — and the context that makes them effective.</li>
       </ul>
       <h4>Why a whole service, not tickets</h4>
-      <p>Depth compounds. Deep context, consistent decisions, and real momentum only happen when one person owns the whole picture over time — and it's exactly the context your agents need to be effective.</p>
+      <p>Depth compounds. Context, consistent decisions, and momentum only build when one person owns the whole picture over time.</p>
     </div>
 
     <div id="src-kit">
