@@ -22,23 +22,12 @@
     display:flex; flex-direction:column;
   }
 
-  /* ---- deck / slides ---- */
+  /* ---- deck / slides (rigid filmstrip — one moving track, no overlap) ---- */
   .deck{flex:1;position:relative;min-height:0;overflow:hidden}
-  .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
-         padding:clamp(18px,3vh,40px) clamp(24px,4vw,56px);gap:clamp(20px,3vh,44px);
-         pointer-events:none;will-change:transform;transform:translateY(100%)}
-  .slide.after{transform:translateY(100%)}    /* upcoming — parked below */
-  .slide.before{transform:translateY(-100%)}  /* seen — pushed above */
-  .slide.active{pointer-events:auto;transform:translateY(0)}
-  /* casino-reel roll: fast spin-in, stretch, overshoot, snap */
-  .slide.roll-in-up{animation:reelInUp .66s cubic-bezier(.19,.86,.32,1.05) both}
-  .slide.roll-out-up{animation:reelOutUp .5s cubic-bezier(.55,.06,.7,.28) both}
-  .slide.roll-in-down{animation:reelInDown .66s cubic-bezier(.19,.86,.32,1.05) both}
-  .slide.roll-out-down{animation:reelOutDown .5s cubic-bezier(.55,.06,.7,.28) both}
-  @keyframes reelInUp{0%{transform:translateY(108%) scaleY(1.14)}58%{transform:translateY(-5%) scaleY(.97)}80%{transform:translateY(2%) scaleY(1)}100%{transform:translateY(0) scaleY(1)}}
-  @keyframes reelOutUp{0%{transform:translateY(0) scaleY(1)}100%{transform:translateY(-112%) scaleY(1.14)}}
-  @keyframes reelInDown{0%{transform:translateY(-108%) scaleY(1.14)}58%{transform:translateY(5%) scaleY(.97)}80%{transform:translateY(-2%) scaleY(1)}100%{transform:translateY(0) scaleY(1)}}
-  @keyframes reelOutDown{0%{transform:translateY(0) scaleY(1)}100%{transform:translateY(112%) scaleY(1.14)}}
+  .track{position:absolute;inset:0;display:flex;flex-direction:column;will-change:transform;
+         transition:transform .72s cubic-bezier(.2,1.28,.3,1)}   /* overshoot = slot-reel settle */
+  .slide{flex:0 0 100%;height:100%;display:flex;flex-direction:column;justify-content:center;
+         padding:clamp(18px,3vh,40px) clamp(24px,4vw,56px);gap:clamp(20px,3vh,44px);background:#fff}
 
   .eyebrow{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
   .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
@@ -193,9 +182,10 @@
   </defs></svg>
 
   <div class="deck" id="deck">
+   <div class="track" id="track">
 
     <!-- 1 — HOOK -->
-    <section class="slide active">
+    <section class="slide">
       <div>
         <h1>The world already changed how software gets built. <span class="accent">Now we do too.</span></h1>
       </div>
@@ -426,6 +416,7 @@
       </div>
     </section>
 
+   </div>
   </div>
 
   <div class="nav">
@@ -560,30 +551,15 @@
   const prev = document.getElementById('prev');
   const next = document.getElementById('next');
   const prog = document.getElementById('prog');
+  const track = document.getElementById('track');
   let i = 0;
-  const ROLLS = ['roll-in-up', 'roll-out-up', 'roll-in-down', 'roll-out-down'];
 
-  function place(){
-    slides.forEach((s, k) => {
-      s.classList.remove('active', 'before', 'after');
-      s.classList.add(k === i ? 'active' : (k < i ? 'before' : 'after'));
-    });
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    track.style.transform = 'translateY(' + (-i * 100) + '%)';
     prog.style.width = ((i + 1) / slides.length * 100) + '%';
     prev.disabled = i === 0;
     next.disabled = i === slides.length - 1;
-  }
-
-  function go(n){
-    n = Math.max(0, Math.min(slides.length - 1, n));
-    if (n === i) { place(); return; }
-    const dir = n > i ? 'up' : 'down';           // next (down button) → content rolls up
-    const outgoing = slides[i], incoming = slides[n];
-    slides.forEach(s => s.classList.remove(...ROLLS));
-    i = n;
-    place();
-    void incoming.offsetWidth;                    // restart the reel animation
-    incoming.classList.add(dir === 'up' ? 'roll-in-up' : 'roll-in-down');
-    outgoing.classList.add(dir === 'up' ? 'roll-out-up' : 'roll-out-down');
   }
   prev.addEventListener('click', () => go(i - 1));
   next.addEventListener('click', () => go(i + 1));
