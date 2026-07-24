@@ -108,6 +108,18 @@
   .qaa b{color:var(--ink);font-weight:700}
   .qaa code{font-family:var(--mono);font-size:.86em;color:var(--ink);font-weight:600}
 
+  /* ---- agenda / overview ---- */
+  .agenda{width:min(1180px,90vw)}
+  .arow{display:flex;align-items:center;gap:clamp(20px,3vw,44px);padding:clamp(14px,2.3vh,30px) 6px;border-top:2px solid var(--line);cursor:pointer;transition:padding-left .18s,color .18s}
+  .agenda .arow:last-child{border-bottom:2px solid var(--line)}
+  .arow:hover{padding-left:20px}
+  .arow .an{font-size:clamp(26px,3.6vw,50px);font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;flex-shrink:0}
+  .arow .at{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+  .arow .at b{font-size:clamp(20px,2.7vw,38px);font-weight:800;color:var(--ink);letter-spacing:-.03em;line-height:1}
+  .arow .ad{font-size:clamp(13px,1.5vw,19px);color:var(--sub);font-weight:500;line-height:1.25}
+  .arow .ago{font-size:clamp(18px,2vw,26px);color:var(--faint);font-weight:800;flex-shrink:0;transition:color .18s}
+  .arow:hover .ago{color:var(--accent)}
+
   /* ---- monday steps ---- */
   .mrows{width:min(1040px,84vw)}
   .mrow{display:flex;align-items:baseline;gap:clamp(20px,3.4vw,52px);padding:clamp(13px,2vh,26px) 4px;border-top:2px solid var(--line)}
@@ -184,28 +196,19 @@
   <div class="deck" id="deck">
    <div class="track" id="track">
 
-    <!-- 1 — HOOK -->
+    <!-- 1 — OVERVIEW -->
     <section class="slide">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> The five shifts</div>
+        <h1>How we build <span class="accent">now.</span></h1>
+      </div>
       <div class="stage">
-        <div class="split">
-          <div class="col a">
-            <div class="k">A year ago</div>
-            <h2>You wrote the code.</h2>
-            <ul>
-              <li>Ticket in, code out — one at a time</li>
-              <li>Value measured in lines shipped</li>
-              <li>Context lived in your head</li>
-            </ul>
-          </div>
-          <div class="col b">
-            <div class="k">Today</div>
-            <h2>You direct the system that writes it.</h2>
-            <ul>
-              <li>Own outcomes, not tickets</li>
-              <li>Value measured in leverage &amp; judgment</li>
-              <li>Context lives in the repo, for your agents</li>
-            </ul>
-          </div>
+        <div class="agenda">
+          <div class="arow" data-goto="1"><span class="an">01</span><span class="at"><b>Mindset</b><span class="ad">engineer → technical product manager + engineering manager</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-goto="2"><span class="an">02</span><span class="at"><b>Ownership</b><span class="ad">own a whole service for a period, not a ticket at a time</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-goto="3"><span class="an">03</span><span class="at"><b>Standards</b><span class="ad">the agentic harness lives in the repo, for your agents</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-goto="4"><span class="an">04</span><span class="at"><b>Automation</b><span class="ad">the cloud flow carries most of the work</span></span><span class="ago">↗</span></div>
+          <div class="arow" data-goto="5"><span class="an">05</span><span class="at"><b>The new day-to-day</b><span class="ad">invest in flows and context, not hand-written PRs</span></span><span class="ago">↗</span></div>
         </div>
       </div>
     </section>
@@ -213,7 +216,7 @@
     <!-- 2 — PILLAR 0: MINDSET -->
     <section class="slide">
       <div>
-        <div class="eyebrow"><span class="dot"></span> Pillar 0 · The mindset shift</div>
+        <div class="eyebrow"><span class="dot"></span> Shift 01 · Mindset</div>
         <h1>Stop being <span class="accent">“just a programmer.”</span></h1>
       </div>
       <div class="stage">
@@ -251,7 +254,7 @@
     <!-- 3 — PILLAR 1: OWNERSHIP -->
     <section class="slide">
       <div>
-        <div class="eyebrow"><span class="dot"></span> Pillar 1 · Ownership</div>
+        <div class="eyebrow"><span class="dot"></span> Shift 02 · Ownership</div>
         <h1>You own a <span class="accent">service</span>, not a ticket.</h1>
         <p class="lede">Your team lead assigns your focus for a period — roughly three months. For that service, you are everything. <span class="click" data-modal="own" style="font-weight:700;color:var(--ink)">What you own<span class="up">↗</span></span></p>
       </div>
@@ -287,7 +290,7 @@
     <!-- 5 — PILLAR 2: STANDARDS -->
     <section class="slide">
       <div>
-        <div class="eyebrow"><span class="dot"></span> Pillar 2 · Standards</div>
+        <div class="eyebrow"><span class="dot"></span> Shift 03 · Standards</div>
         <h1>Your repo is your agents' <span class="accent">operating manual.</span></h1>
       </div>
       <div class="stage">
@@ -321,7 +324,7 @@
     <!-- 6 — PILLAR 3: AUTOMATION -->
     <section class="slide">
       <div>
-        <div class="eyebrow"><span class="dot"></span> Pillar 3 · Automation</div>
+        <div class="eyebrow"><span class="dot"></span> Shift 04 · Automation</div>
         <h1>The cloud flow carries <span class="accent">most of the work.</span></h1>
       </div>
       <div class="stage">
@@ -361,7 +364,7 @@
     <!-- 7 — PILLAR 4: NEW DAY-TO-DAY -->
     <section class="slide">
       <div>
-        <div class="eyebrow"><span class="dot"></span> Pillar 4 · The new day-to-day</div>
+        <div class="eyebrow"><span class="dot"></span> Shift 05 · The new day-to-day</div>
         <h1>Your job is the <span class="accent">flow</span>, not the PR.</h1>
       </div>
       <div class="stage">
@@ -437,7 +440,7 @@
   <div style="display:none">
 
     <div id="src-tpm">
-      <div class="meyebrow">Pillar 0 · Role one</div>
+      <div class="meyebrow">Shift 01 · Role one</div>
       <h2>Technical Product Manager</h2>
       <p class="msub">Facing <b>up</b> — toward the product team. You stop being an order-taker and start co-owning the product.</p>
       <h4>What it asks of you</h4>
@@ -452,7 +455,7 @@
     </div>
 
     <div id="src-em">
-      <div class="meyebrow">Pillar 0 · Role two</div>
+      <div class="meyebrow">Shift 01 · Role two</div>
       <h2>Engineering Manager</h2>
       <p class="msub">Facing <b>down</b> — toward your agents. They are your team members; you are their lead.</p>
       <h4>What it asks of you</h4>
@@ -467,7 +470,7 @@
     </div>
 
     <div id="src-own">
-      <div class="meyebrow">Pillar 1 · Ownership</div>
+      <div class="meyebrow">Shift 02 · Ownership</div>
       <h2>What you own for the period</h2>
       <p class="msub">For roughly three months, one service is yours. You wear every hat.</p>
       <h4>The hats</h4>
@@ -483,7 +486,7 @@
     </div>
 
     <div id="src-kit">
-      <div class="meyebrow">Pillar 2 · Standards · agentic-standards-kit v1.7.0</div>
+      <div class="meyebrow">Shift 03 · Standards · agentic-standards-kit v1.7.0</div>
       <h2>The agentic harness, exactly</h2>
       <p class="msub">Drop-in and versioned. Apply it to any service repo with <code>bin/sync.ps1</code> / <code>bin/sync.sh</code> and the repo carries its own standards, CI gates, and dispatch workflows.</p>
       <div class="tree"><span class="fn">agentic-standards-kit/</span>
@@ -513,7 +516,7 @@
     </div>
 
     <div id="src-cloud">
-      <div class="meyebrow">Pillar 3 · Automation · The cloud flow</div>
+      <div class="meyebrow">Shift 04 · Automation · The cloud flow</div>
       <h2>The cloud flow — most of the work</h2>
       <p class="msub">Bugs <b>and spec'd stories alike</b>. You run the whole thing from <b>Radix Flows</b> and dispatch cloud agents — you rarely open a local checkout.</p>
       <h4>How it flows</h4>
@@ -528,7 +531,7 @@
     </div>
 
     <div id="src-complex">
-      <div class="meyebrow">Pillar 3 · Automation · Hands-on</div>
+      <div class="meyebrow">Shift 04 · Automation · Hands-on</div>
       <h2>Hands-on — the complex few</h2>
       <p class="msub">The minority of tickets that need real decisions or architecture. Here you work directly with a <b>local agent</b>.</p>
       <h4>How it flows</h4>
@@ -560,6 +563,10 @@
   }
   prev.addEventListener('click', () => go(i - 1));
   next.addEventListener('click', () => go(i + 1));
+
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.addEventListener('click', () => go(parseInt(el.getAttribute('data-goto'), 10)));
+  });
 
   /* ---- modal ---- */
   const overlay = document.getElementById('overlay');
