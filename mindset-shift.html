@@ -26,8 +26,11 @@
   .deck{flex:1;position:relative;min-height:0}
   .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;
          padding:clamp(18px,3vh,40px) clamp(24px,4vw,56px);gap:clamp(20px,3vh,44px);
-         opacity:0;pointer-events:none;transform:translateY(12px);transition:opacity .45s ease, transform .45s cubic-bezier(.2,.9,.3,1)}
-  .slide.active{opacity:1;pointer-events:auto;transform:none}
+         opacity:0;pointer-events:none;will-change:transform,opacity;
+         transition:transform .55s cubic-bezier(.16,1,.3,1), opacity .4s ease}
+  .slide.after{transform:translateY(-9vh) scale(.985)}   /* upcoming — waiting above */
+  .slide.before{transform:translateY(9vh) scale(.985)}   /* seen — exited below */
+  .slide.active{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
 
   .eyebrow{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
   .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
@@ -553,7 +556,10 @@
 
   function go(n){
     i = Math.max(0, Math.min(slides.length - 1, n));
-    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    slides.forEach((s, k) => {
+      s.classList.remove('active', 'before', 'after');
+      s.classList.add(k === i ? 'active' : (k < i ? 'before' : 'after'));
+    });
     prog.style.width = ((i + 1) / slides.length * 100) + '%';
     prev.disabled = i === 0;
     next.disabled = i === slides.length - 1;
