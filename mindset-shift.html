@@ -25,7 +25,7 @@
   /* ---- deck / slides (rigid filmstrip — one moving track, no overlap) ---- */
   .deck{flex:1;position:relative;min-height:0;overflow:hidden}
   .track{position:absolute;inset:0;display:flex;flex-direction:column;will-change:transform;
-         transition:transform .72s cubic-bezier(.2,1.28,.3,1)}   /* overshoot = slot-reel settle */
+         transition:transform .5s cubic-bezier(.2,1.28,.3,1)}   /* overshoot = slot-reel settle */
   .slide{flex:0 0 100%;height:100%;display:flex;flex-direction:column;justify-content:center;
          padding:clamp(18px,3vh,40px) clamp(24px,4vw,56px);gap:clamp(20px,3vh,44px);background:#fff}
 
@@ -186,9 +186,6 @@
 
     <!-- 1 — HOOK -->
     <section class="slide">
-      <div>
-        <h1>The world already changed how software gets built. <span class="accent">Now we do too.</span></h1>
-      </div>
       <div class="stage">
         <div class="split">
           <div class="col a">
