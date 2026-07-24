@@ -511,6 +511,7 @@
         <div class="files">
           <div class="frow"><span class="fn">agentic-standards-kit</span><span class="fd">RadixInc/agentic-standards-kit — install with bin/sync</span></div>
           <div class="frow"><span class="fn">Radix Flows</span><span class="fd">flows.radix.builders — run your tickets, dispatch cloud agents</span></div>
+          <div class="frow"><span class="fn">radix-agent-control</span><span class="fd">RadixInc/radix-agent-control — central dispatch &amp; multi-repo orchestration</span></div>
           <div class="frow"><span class="fn">Terminal agents</span><span class="fd">Claude Code · Cursor CLI · Codex CLI — config ships in the kit's .claude/ and .cursor/</span></div>
           <div class="frow"><span class="fn">Kit docs</span><span class="fd">agentic-dispatch · agent-ready-checklist · metrics</span></div>
           <div class="frow"><span class="fn">This deck</span><span class="fd">agonfetiu.github.io/agentic-workflow-demo</span></div>
@@ -612,23 +613,21 @@
     </div>
 
     <div id="src-kit">
-      <div class="meyebrow">Shift 03 · Standards · agentic-standards-kit v1.7.0</div>
+      <div class="meyebrow">Shift 03 · Standards · agentic-standards-kit</div>
       <h2>The agentic harness, exactly</h2>
-      <p class="msub">Drop-in and versioned. Apply it to any service repo with <code>bin/sync.ps1</code> / <code>bin/sync.sh</code> and the repo carries its own standards, CI gates, and dispatch workflows.</p>
+      <p class="msub">Drop-in and versioned. Apply it to any service repo with <code>bin/sync.ps1</code> / <code>bin/sync.sh</code> and the repo carries its own standards and CI gates. <b>Dispatch &amp; orchestration are centralized</b> — see below.</p>
       <div class="tree"><span class="fn">agentic-standards-kit/</span>
 ├── <span class="fn">AGENTS.md</span>                       <span class="cm">← rules every AI agent reads first (&lt;80 lines)</span>
 ├── <span class="fn">CONTEXT.md</span>                      <span class="cm">← domain glossary — how you name things</span>
 ├── <span class="dir">docs/</span>
 │   ├── <span class="dir">adr/</span>                        <span class="cm">← 0001 methodology · 0002 verification · 0003 autonomy tiers</span>
-│   ├── <span class="fn">agentic-dispatch.md</span>         <span class="cm">← the dispatch flow + per-repo prereqs</span>
+│   ├── <span class="fn">agentic-dispatch.md</span>         <span class="cm">← how dispatch works (via radix-agent-control)</span>
 │   ├── <span class="fn">agent-ready-checklist.md</span>    <span class="cm">← repo readiness audit</span>
 │   └── <span class="fn">metrics.md</span>                  <span class="cm">← KPIs + autonomy promotion bar</span>
 ├── <span class="dir">specs/</span><span class="fn">_template/spec.md</span>          <span class="cm">← EARS criteria with stable AC IDs</span>
 ├── <span class="dir">.claude/</span>                        <span class="cm">← Claude Code hooks + /sync-jira skill</span>
 ├── <span class="dir">.cursor/</span>                        <span class="cm">← Cursor hooks, Atlassian MCP, cloud-agent env</span>
-├── <span class="dir">.github/workflows/</span>
-│   ├── <span class="fn">dispatch-agent.yml</span>          <span class="cm">← receives the Jira dispatch</span>
-│   ├── <span class="fn">implement-on-spec-merge.yml</span> <span class="cm">← spec PR merge → implementation agent</span>
+├── <span class="dir">.github/workflows/</span>       <span class="cm">← CI gates only — dispatch lives in radix-agent-control</span>
 │   ├── <span class="fn">spec-traceability.yml</span>       <span class="cm">← deterministic definition-of-done gate</span>
 │   └── <span class="fn">label-prs.yml</span>               <span class="cm">← fact-derived auto-labels (spec / impl)</span>
 └── <span class="fn">bin/sync.ps1 · bin/sync.sh</span>       <span class="cm">← apply / update the kit in a repo</span></div>
@@ -639,6 +638,8 @@
         <li><span class="mk">ADR</span> Architecture Decision Records — the durable <i>why</i> behind every big call.</li>
         <li><span class="mk">SPECS</span> EARS acceptance criteria with stable AC IDs; tests reference the IDs verbatim, and the traceability gate enforces coverage.</li>
       </ul>
+      <h4>Dispatch lives centrally — radix-agent-control</h4>
+      <p>The dispatch and orchestration workflows no longer sit in every repo. They live once in <b>RadixInc/radix-agent-control</b>. From there a single cloud agent can span <b>several repos in one ticket</b> and open a repo-scoped PR in each — no per-repo duplication to maintain.</p>
     </div>
 
     <div id="src-cloud">
@@ -649,7 +650,7 @@
       <ul>
         <li><span class="mk">1</span> A ticket lands in <b>Radix Flows</b> — where you manage the entire flow.</li>
         <li><span class="mk">2</span> Needs a spec? <b>You review and edit the spec right there, then merge it</b> — that merge is the approval gate.</li>
-        <li><span class="mk">3</span> You <b>dispatch a cloud agent</b> (<code>repository_dispatch</code> → Cursor cloud agent); it implements and opens a PR. For bugs, a failing repro test named with the key comes first.</li>
+        <li><span class="mk">3</span> You <b>dispatch a cloud agent</b> through <b>radix-agent-control</b> (the central control plane). One agent can span <b>several repos in the ticket</b> and open a repo-scoped PR in each. For bugs, a failing repro test named with the key comes first.</li>
         <li><span class="mk">4</span> <b>You review and merge.</b> CI and the traceability gate have already run.</li>
       </ul>
       <h4>Why this is the default</h4>
