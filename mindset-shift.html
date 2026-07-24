@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The New Way We Build — Radix Engineering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo:#4f46e5; --indigo-h:#4338ca;
+    --live:#3fb950; --pilot:#e3b341; --now:#8ba2ff;
+    --mono:'JetBrains Mono','SF Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;
+    background:radial-gradient(1200px 700px at 50% -10%, #1c2447 0%, #0f1430 55%, #0a0e22 100%);
+    color:#eaefff; height:100%; overflow:hidden; -webkit-font-smoothing:antialiased;
+    display:flex; flex-direction:column;
+  }
+
+  /* ---- top bar ---- */
+  .topbar{display:flex;align-items:center;gap:14px;padding:14px 24px;flex-shrink:0}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:15px;letter-spacing:-.01em}
+  .brand .dot{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,#7c93ff,#4f46e5);display:grid;place-items:center;font-size:14px}
+  .brand small{font-weight:500;color:#9fb0e0;font-size:12.5px;margin-left:2px}
+  .topbar .spacer{flex:1}
+  .legend{display:flex;align-items:center;gap:13px;font-size:11px;font-weight:700;color:#9fb0e0}
+  .legend .li{display:flex;align-items:center;gap:6px}
+  .legend .sw{width:9px;height:9px;border-radius:50%}
+  .sw.live{background:var(--live)} .sw.pilot{background:var(--pilot)} .sw.now{background:var(--now)}
+
+  /* ---- deck / slides ---- */
+  .deck{flex:1;position:relative;min-height:0;padding:0 24px 6px}
+  .slide{position:absolute;inset:0 24px 6px;display:flex;flex-direction:column;gap:14px;
+         opacity:0;pointer-events:none;transform:translateY(14px) scale(.995);transition:opacity .5s ease, transform .5s cubic-bezier(.2,.9,.3,1)}
+  .slide.active{opacity:1;pointer-events:auto;transform:none}
+  .slide-head{flex-shrink:0}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#93a4d8}
+  .eyebrow .ph{background:rgba(124,147,255,.16);border:1px solid rgba(124,147,255,.4);color:#c3ccff;padding:3px 10px;border-radius:20px;letter-spacing:.08em}
+  .mat{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:.06em;padding:3px 9px;border-radius:20px;text-transform:uppercase}
+  .mat::before{content:'';width:7px;height:7px;border-radius:50%}
+  .mat.live{background:rgba(63,185,80,.14);border:1px solid rgba(63,185,80,.4);color:#7ee787}.mat.live::before{background:var(--live)}
+  .mat.pilot{background:rgba(227,179,65,.14);border:1px solid rgba(227,179,65,.4);color:#f0d78a}.mat.pilot::before{background:var(--pilot)}
+  .mat.now{background:rgba(139,162,255,.16);border:1px solid rgba(139,162,255,.4);color:#c3ccff}.mat.now::before{background:var(--now)}
+  .slide h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:11px;line-height:1.13}
+  .slide h1 .accent{background:linear-gradient(90deg,#8ba2ff,#c3a0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .slide .lede{font-size:15.5px;color:#b9c5ea;margin-top:9px;max-width:920px;line-height:1.55}
+
+  .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;gap:22px}
+
+  /* ---- generic nodes / cards ---- */
+  .node{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:22px 20px;text-align:center}
+  .node .ni{width:48px;height:48px;border-radius:13px;margin:0 auto 13px;display:grid;place-items:center;font-size:24px;background:rgba(124,147,255,.18)}
+  .node h3{font-size:16px;font-weight:700;margin-bottom:7px}
+  .node p{font-size:13px;color:#b3c0e6;line-height:1.5}
+
+  .clickable{cursor:pointer;position:relative;transition:transform .18s, border-color .18s, background .18s, box-shadow .18s}
+  .clickable:hover{transform:translateY(-4px);border-color:rgba(139,162,255,.55);background:rgba(124,147,255,.09);box-shadow:0 18px 40px -22px rgba(124,147,255,.6)}
+  .clickable .exp{position:absolute;top:11px;right:11px;font-size:9.5px;font-weight:800;letter-spacing:.05em;color:#a9b6e6;background:rgba(124,147,255,.16);border:1px solid rgba(124,147,255,.34);padding:3px 8px;border-radius:20px;display:flex;align-items:center;gap:4px}
+  .clickable:hover .exp{color:#dfe6ff;background:rgba(124,147,255,.3)}
+
+  .arrowcol{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 6px;flex-shrink:0}
+  .arrowcol .lab{font-size:10px;font-weight:700;color:#8ba2ff;font-family:var(--mono);white-space:nowrap;margin-bottom:5px;text-align:center}
+  .arrowcol .ar{font-size:24px;color:#5b6b9a}
+
+  /* ---- hook: then/now ---- */
+  .thennow{display:flex;align-items:stretch;justify-content:center;gap:0;width:min(980px,82vw)}
+  .tn{flex:1;border-radius:16px;padding:26px 24px}
+  .tn.old{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.16)}
+  .tn.new{background:linear-gradient(160deg,rgba(124,147,255,.14),rgba(124,147,255,.05));border:1px solid rgba(139,162,255,.4)}
+  .tn .tag{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px}
+  .tn.old .tag{color:#7c88ad} .tn.new .tag{color:#c3ccff}
+  .tn h2{font-size:21px;font-weight:800;letter-spacing:-.01em;line-height:1.2;margin-bottom:12px}
+  .tn.old h2{color:#c3ccdd} .tn.new h2{color:#fff}
+  .tn ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .tn li{font-size:13.5px;line-height:1.45;display:flex;gap:9px;align-items:flex-start}
+  .tn.old li{color:#9aa6c8} .tn.new li{color:#d3ddf7}
+  .tn li .mk{flex-shrink:0;font-weight:800}
+  .tn.old li .mk{color:#6b769b} .tn.new li .mk{color:#8ba2ff}
+
+  /* ---- role split (mindset) ---- */
+  .roles{display:flex;flex-direction:column;align-items:center;gap:0;width:min(760px,64vw)}
+  .rolenode{width:100%}
+  .youchip{margin:0 auto;background:linear-gradient(135deg,#7c93ff,#4f46e5);color:#fff;font-weight:800;font-size:14px;padding:11px 26px;border-radius:14px;box-shadow:0 14px 34px -16px rgba(124,147,255,.9);display:inline-flex;align-items:center;gap:9px}
+  .rlab{font-size:10.5px;font-family:var(--mono);color:#8ba2ff;font-weight:600;margin:9px 0}
+
+  /* ---- before/after generic ---- */
+  .ba{display:flex;align-items:stretch;justify-content:center;gap:0;width:min(960px,80vw)}
+  .bacol{flex:1;border-radius:16px;padding:24px 22px}
+  .bacol.a{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.15)}
+  .bacol.b{background:linear-gradient(160deg,rgba(124,147,255,.14),rgba(124,147,255,.05));border:1px solid rgba(139,162,255,.4)}
+  .bacol .bt{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:13px}
+  .bacol.a .bt{color:#7c88ad}.bacol.b .bt{color:#c3ccff}
+  .bacol ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .bacol li{font-size:14px;line-height:1.45;display:flex;gap:9px}
+  .bacol.a li{color:#9aa6c8}.bacol.b li{color:#e7edfb;font-weight:500}
+  .bacol li .mk{flex-shrink:0;font-weight:800}.bacol.a li .mk{color:#6b769b}.bacol.b li .mk{color:#8ba2ff}
+
+  /* ---- two-lane automation ---- */
+  .lanes{display:flex;flex-direction:column;gap:16px;width:min(1000px,84vw)}
+  .lane{display:flex;align-items:center;gap:0;border-radius:16px;padding:16px 18px}
+  .lane.toil{background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.28)}
+  .lane.complex{background:rgba(124,147,255,.07);border:1px solid rgba(139,162,255,.34)}
+  .lanehead{width:170px;flex-shrink:0}
+  .lanehead .lt{font-size:15px;font-weight:800;margin-bottom:3px}
+  .lanehead .ls{font-size:11.5px;color:#9fb0e0;line-height:1.4}
+  .lanenodes{flex:1;display:flex;align-items:center;justify-content:center;gap:0}
+  .lnode{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:11px;padding:11px 14px;text-align:center;min-width:96px}
+  .lnode .lni{font-size:19px;margin-bottom:4px}
+  .lnode h4{font-size:12.5px;font-weight:700}
+  .lnode p{font-size:10.5px;color:#a9b6e6;margin-top:2px}
+  .lanes .arrowcol .ar{font-size:19px}
+
+  /* ---- objection cards ---- */
+  .objs{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:min(1000px,84vw)}
+  .obj{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:16px 18px}
+  .obj .q{font-size:14.5px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;gap:9px;align-items:flex-start}
+  .obj .q .qm{color:#ff9a9a;font-weight:800;flex-shrink:0}
+  .obj .a{font-size:12.8px;color:#c3cfec;line-height:1.5;display:flex;gap:9px}
+  .obj .a .am{color:#7ee787;font-weight:800;flex-shrink:0}
+
+  /* ---- monday actions ---- */
+  .steps{display:flex;flex-direction:column;gap:12px;width:min(880px,72vw)}
+  .stepc{display:flex;align-items:center;gap:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);border-radius:13px;padding:15px 18px}
+  .stepc .sn{width:34px;height:34px;flex-shrink:0;border-radius:10px;background:rgba(124,147,255,.2);color:#c3ccff;display:grid;place-items:center;font-weight:800;font-size:15px}
+  .stepc .sx{font-size:14.5px;color:#e7edfb;line-height:1.4}
+  .stepc .sx b{color:#fff}
+  .stepc code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.09);padding:2px 7px;border-radius:5px;color:#dfe6ff}
+
+  /* ---- caption ---- */
+  .cap{flex-shrink:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 17px;display:flex;align-items:center;gap:13px}
+  .cap .cnum{width:26px;height:26px;border-radius:8px;background:rgba(124,147,255,.2);color:#c3ccff;display:grid;place-items:center;font-weight:800;font-size:13px;flex-shrink:0}
+  .cap p{font-size:13.5px;color:#cdd7f5;line-height:1.5}
+  .cap b{color:#fff}
+  .cap code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.09);padding:2px 7px;border-radius:5px;color:#dfe6ff}
+
+  .bigline{font-size:20px;font-weight:800;letter-spacing:-.01em;color:#fff;text-align:center;max-width:760px;line-height:1.3}
+  .bigline .accent{background:linear-gradient(90deg,#8ba2ff,#c3a0ff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+  /* ---- nav ---- */
+  .nav{display:flex;align-items:center;justify-content:center;gap:16px;padding:10px 24px 16px;flex-shrink:0}
+  .arrow{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#e6edff;
+         display:grid;place-items:center;cursor:pointer;transition:.15s}
+  .arrow:hover{background:rgba(124,147,255,.28);transform:translateY(-1px)}
+  .arrow:disabled{opacity:.3;cursor:default;transform:none}
+  .arrow svg{width:20px;height:20px}
+  .dots{display:flex;align-items:center;gap:8px}
+  .dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.22);cursor:pointer;transition:.15s}
+  .dot.on{background:#8ba2ff;transform:scale(1.25);box-shadow:0 0 0 4px rgba(139,162,255,.18)}
+  .counter{font-size:12.5px;font-weight:700;color:#9fb0e0;font-variant-numeric:tabular-nums;min-width:54px;text-align:center}
+  .hint{position:fixed;bottom:14px;right:20px;font-size:11px;color:#7c88ad}
+  .kbd{font-family:var(--mono);font-size:10.5px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:5px;padding:2px 6px;color:#b9c5ea}
+
+  /* ---- modal overlay ---- */
+  .overlay{position:fixed;inset:0;background:rgba(6,9,22,.72);backdrop-filter:blur(7px);z-index:50;
+           display:flex;align-items:center;justify-content:center;padding:32px;opacity:0;pointer-events:none;transition:opacity .22s}
+  .overlay.on{opacity:1;pointer-events:auto}
+  .modal{width:min(820px,92vw);max-height:86vh;overflow:auto;background:linear-gradient(180deg,#161d3d,#111634);
+         border:1px solid rgba(139,162,255,.32);border-radius:18px;padding:28px 30px;box-shadow:0 50px 120px -30px rgba(0,0,0,.8);
+         transform:translateY(18px) scale(.97);transition:transform .26s cubic-bezier(.2,.9,.3,1)}
+  .overlay.on .modal{transform:none}
+  .modal .mclose{position:sticky;top:0;float:right;margin:-8px -8px 0 0;width:34px;height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.16);
+         background:rgba(255,255,255,.06);color:#dfe6ff;font-size:16px;cursor:pointer;display:grid;place-items:center}
+  .modal .mclose:hover{background:rgba(124,147,255,.28)}
+  .modal .meyebrow{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#93a4d8;margin-bottom:8px}
+  .modal h2{font-size:23px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px;line-height:1.2}
+  .modal .msub{font-size:14px;color:#b9c5ea;line-height:1.55;margin-bottom:18px}
+  .modal h4{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#93a4d8;margin:20px 0 10px}
+  .modal p{font-size:13.8px;color:#cdd7f5;line-height:1.6;margin-bottom:10px}
+  .modal code{font-family:var(--mono);font-size:12px;background:rgba(255,255,255,.09);padding:2px 7px;border-radius:5px;color:#dfe6ff}
+  .modal ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin:2px 0 4px}
+  .modal li{font-size:13.6px;color:#d3ddf7;line-height:1.5;display:flex;gap:10px}
+  .modal li .mk{color:#8ba2ff;font-weight:800;flex-shrink:0}
+
+  /* file tree in modal */
+  .tree{font-family:var(--mono);font-size:12.6px;line-height:1.95;background:#0c1024;border:1px solid rgba(255,255,255,.1);border-radius:11px;padding:16px 18px;color:#c7d2f0;white-space:pre;overflow:auto}
+  .tree .fn{color:#8ba2ff;font-weight:600}
+  .tree .cm{color:#6b769b}
+  .tree .dir{color:#e3b341;font-weight:600}
+
+  .cmd{font-family:var(--mono);font-size:12.6px;background:#0c1024;border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:11px 14px;color:#9be7b0;margin:4px 0 6px}
+  .cmd .pr{color:#6b769b}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><span class="dot">◆</span> The New Way We Build <small>· Radix Engineering</small></div>
+    <div class="spacer"></div>
+    <div class="legend">
+      <span class="li"><span class="sw live"></span>Live</span>
+      <span class="li"><span class="sw pilot"></span>Piloting</span>
+      <span class="li"><span class="sw now"></span>In effect</span>
+    </div>
+  </div>
+
+  <div class="deck" id="deck">
+
+    <!-- 1 — HOOK -->
+    <section class="slide active">
+      <div class="slide-head">
+        <span class="eyebrow">Radix · Engineering</span>
+        <h1>The world already changed how software gets built. <span class="accent">Now we do too.</span></h1>
+        <p class="lede">This isn't a new tool. It's a change in what your job <b>is</b>. The question was never <i>if</i> we adapt — only how fast.</p>
+      </div>
+      <div class="stage">
+        <div class="thennow">
+          <div class="tn old">
+            <div class="tag">A year ago</div>
+            <h2>You wrote the code.</h2>
+            <ul>
+              <li><span class="mk">·</span> Ticket in, code out — one at a time</li>
+              <li><span class="mk">·</span> Value measured in lines shipped</li>
+              <li><span class="mk">·</span> Wait for a perfect ticket to start</li>
+              <li><span class="mk">·</span> Context lives in your head</li>
+            </ul>
+          </div>
+          <div class="arrowcol"><span class="lab">the frontier<br>moved</span><span class="ar">→</span></div>
+          <div class="tn new">
+            <div class="tag">Today</div>
+            <h2>You direct the system that writes it.</h2>
+            <ul>
+              <li><span class="mk">›</span> Own outcomes, not tickets</li>
+              <li><span class="mk">›</span> Value measured in leverage &amp; judgment</li>
+              <li><span class="mk">›</span> Shape the work — you drive it</li>
+              <li><span class="mk">›</span> Context lives in the repo, for your agents</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">→</span><p>Everything in this deck follows from one idea: <b>the craft moved up a level.</b> We're not doing less engineering — we're doing engineering with far more leverage.</p></div>
+    </section>
+
+    <!-- 2 — PILLAR 0: MINDSET -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="eyebrow"><span class="ph">Pillar 0</span> The mindset shift</span>
+        <h1>Stop being <span class="accent">“just a programmer.”</span></h1>
+        <p class="lede">You now sit in the middle of two roles. Click each to see what it asks of you.</p>
+      </div>
+      <div class="stage">
+        <div class="roles">
+          <div class="node rolenode clickable" data-modal="tpm">
+            <span class="exp">＋ details</span>
+            <div class="ni">🎯</div>
+            <h3>Technical Product Manager</h3>
+            <p>Facing the product team — you shape the <i>what</i> and the <i>why</i>. You don't wait for a perfect ticket; you help write it.</p>
+          </div>
+          <div class="rlab">▲ up to product &nbsp;·&nbsp; ▼ down to your agents</div>
+          <div class="youchip">◆ YOU — the owner in the middle</div>
+          <div class="rlab">▼</div>
+          <div class="node rolenode clickable" data-modal="em">
+            <span class="exp">＋ details</span>
+            <div class="ni">👥</div>
+            <h3>Engineering Manager</h3>
+            <p>Facing your agents — they are your team. You coordinate, delegate, review, and own the output. You lead the work; you don't grind it.</p>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">0</span><p>Overcome the <b>“I'm only a programmer”</b> feeling. The people who thrive from here offer much more than code — they offer direction, judgment, and ownership.</p></div>
+    </section>
+
+    <!-- 3 — IDENTITY REFRAME -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="eyebrow">The reframe</span>
+        <h1>This is a <span class="accent">promotion</span>, not a replacement.</h1>
+        <p class="lede">The thing you're good at doesn't disappear. It moves up a level — and multiplies.</p>
+      </div>
+      <div class="stage">
+        <div class="ba">
+          <div class="bacol a">
+            <div class="bt">What you used to sell</div>
+            <ul>
+              <li><span class="mk">·</span> Writing the implementation</li>
+              <li><span class="mk">·</span> Knowing the syntax &amp; the framework</li>
+              <li><span class="mk">·</span> Throughput on one ticket at a time</li>
+            </ul>
+          </div>
+          <div class="arrowcol"><span class="lab">levels up</span><span class="ar">→</span></div>
+          <div class="bacol b">
+            <div class="bt">What you sell now</div>
+            <ul>
+              <li><span class="mk">›</span> Designing the system &amp; the architecture</li>
+              <li><span class="mk">›</span> Directing a team of agents to build it</li>
+              <li><span class="mk">›</span> Owning the outcome of a whole service</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">✦</span><p class="bigline" style="text-align:left"><span style="color:#cdd7f5;font-size:14px;font-weight:500">Your value was never the typing.</span> <span class="accent">It was always the judgment.</span></p></div>
+    </section>
+
+    <!-- 4 — PILLAR 1: OWNERSHIP -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="eyebrow"><span class="ph">Pillar 1</span> Ownership <span class="mat now">In effect</span></span>
+        <h1>You own a <span class="accent">service</span>, not a ticket.</h1>
+        <p class="lede">Your team lead assigns your focus for a period — roughly three months. For that service, you are everything.</p>
+      </div>
+      <div class="stage">
+        <div class="ba">
+          <div class="bacol a">
+            <div class="bt">Ticket-by-ticket</div>
+            <ul>
+              <li><span class="mk">·</span> Pull the next card off the queue</li>
+              <li><span class="mk">·</span> Constant context-switching</li>
+              <li><span class="mk">·</span> Nobody owns the whole picture</li>
+              <li><span class="mk">·</span> "Not my area" happens a lot</li>
+            </ul>
+          </div>
+          <div class="arrowcol"><span class="lab">~3-month<br>horizon</span><span class="ar">→</span></div>
+          <div class="node bacol b clickable" data-modal="own" style="text-align:left">
+            <span class="exp">＋ what you own</span>
+            <div class="bt">Own the service</div>
+            <ul>
+              <li><span class="mk">›</span> You are the <b>PM</b> — the roadmap</li>
+              <li><span class="mk">›</span> You are the <b>architect</b> — the design</li>
+              <li><span class="mk">›</span> You are the <b>engineer</b> — with your agents</li>
+              <li><span class="mk">›</span> You <b>drive &amp; own</b> the whole thing</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">1</span><p>Depth beats breadth. When one person owns a service end-to-end for months, the quality, the context, and the momentum all compound. <b>You drive it — you don't wait to be told.</b></p></div>
+    </section>
+
+    <!-- 5 — PILLAR 2: STANDARDS -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="eyebrow"><span class="ph">Pillar 2</span> Standards <span class="mat live">Live · kit v1.7.0</span></span>
+        <h1>Your repo is your agents' <span class="accent">operating manual.</span></h1>
+        <p class="lede">Agents are only as good as the context you give them. We standardize that context at the repo level — drop-in, versioned, one command to install.</p>
+      </div>
+      <div class="stage">
+        <div class="node clickable" data-modal="kit" style="width:min(720px,62vw);text-align:left">
+          <span class="exp">＋ open the structure</span>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+            <div class="ni" style="margin:0">🧰</div>
+            <div><h3 style="margin:0">agentic-standards-kit</h3><p style="margin-top:3px">The harness every service repo installs. Click to see the exact structure.</p></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="obj" style="padding:12px 14px"><div class="q" style="font-size:13px;margin:0"><span style="color:#8ba2ff">📄</span> AGENTS.md</div><div class="a" style="margin-top:5px"><span></span>The rules every agent reads first — how to work a ticket, spec-first.</div></div>
+            <div class="obj" style="padding:12px 14px"><div class="q" style="font-size:13px;margin:0"><span style="color:#8ba2ff">📖</span> CONTEXT.md</div><div class="a" style="margin-top:5px"><span></span>The domain glossary — so agents name things the way you do.</div></div>
+            <div class="obj" style="padding:12px 14px"><div class="q" style="font-size:13px;margin:0"><span style="color:#8ba2ff">🏛️</span> docs/adr/</div><div class="a" style="margin-top:5px"><span></span>Architecture Decision Records — the <i>why</i> behind the design.</div></div>
+            <div class="obj" style="padding:12px 14px"><div class="q" style="font-size:13px;margin:0"><span style="color:#8ba2ff">📐</span> specs/</div><div class="a" style="margin-top:5px"><span></span>EARS specs with stable AC IDs — the contract before any code.</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">2</span><p>Install it once — <code>bin/sync.ps1</code> / <code>sync.sh</code> — and the repo carries its own standards, CI gates, and dispatch workflows. <b>Great context is now part of the job, not an afterthought.</b></p></div>
+    </section>
+
+    <!-- 6 — PILLAR 3: AUTOMATION -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="eyebrow"><span class="ph">Pillar 3</span> Automation <span class="mat pilot">Piloting → rolling out</span></span>
+        <h1>Let the machine do the <span class="accent">toil.</span></h1>
+        <p class="lede">Work splits into two lanes. Click a lane for the detail.</p>
+      </div>
+      <div class="stage">
+        <div class="lanes">
+          <div class="lane toil clickable" data-modal="toil">
+            <span class="exp">＋ details</span>
+            <div class="lanehead"><div class="lt">Toil lane</div><div class="ls">Bugs &amp; small tickets — automated</div></div>
+            <div class="lanenodes">
+              <div class="lnode"><div class="lni">🐛</div><h4>Bug / small</h4></div>
+              <div class="arrowcol"><span class="ar">→</span></div>
+              <div class="lnode"><div class="lni">🌊</div><h4>Radix Flows</h4><p>manage the flow</p></div>
+              <div class="arrowcol"><span class="ar">→</span></div>
+              <div class="lnode"><div class="lni">🤖</div><h4>Cloud agents</h4><p>open the PR</p></div>
+              <div class="arrowcol"><span class="ar">→</span></div>
+              <div class="lnode"><div class="lni">👀</div><h4>You review</h4></div>
+            </div>
+          </div>
+          <div class="lane complex clickable" data-modal="complex">
+            <span class="exp">＋ details</span>
+            <div class="lanehead"><div class="lt">Complex lane</div><div class="ls">Decisions &amp; architecture — you + agents</div></div>
+            <div class="lanenodes">
+              <div class="lnode"><div class="lni">🧠</div><h4>Hard problem</h4></div>
+              <div class="arrowcol"><span class="ar">→</span></div>
+              <div class="lnode"><div class="lni">📐</div><h4>Spec first</h4><p>you decide</p></div>
+              <div class="arrowcol"><span class="ar">→</span></div>
+              <div class="lnode"><div class="lni">◆</div><h4>You + agent</h4><p>build together</p></div>
+              <div class="arrowcol"><span class="ar">→</span></div>
+              <div class="lnode"><div class="lni">✅</div><h4>You own it</h4></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">3</span><p>Two reasons: <b>kill developer toil</b>, and <b>keep yourself busy with the bigger things</b>. <b>Radix Flows</b> is where you manage your ticket flows — the small stuff runs itself so your attention goes where it matters.</p></div>
+    </section>
+
+    <!-- 7 — PILLAR 4: NEW DAY-TO-DAY -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="eyebrow"><span class="ph">Pillar 4</span> The new day-to-day</span>
+        <h1>Your job is the <span class="accent">flow</span>, not the PR.</h1>
+        <p class="lede">The day-to-day work is setting up the right flows and the right context, and working with AI — not grinding pull requests by hand.</p>
+      </div>
+      <div class="stage">
+        <div class="ba">
+          <div class="bacol a">
+            <div class="bt">Where your hours went</div>
+            <ul>
+              <li><span class="mk">·</span> Hand-writing every PR</li>
+              <li><span class="mk">·</span> Grinding through the backlog</li>
+              <li><span class="mk">·</span> Repeating the same toil weekly</li>
+            </ul>
+          </div>
+          <div class="arrowcol"><span class="lab">invest here</span><span class="ar">→</span></div>
+          <div class="bacol b">
+            <div class="bt">Where your hours go now</div>
+            <ul>
+              <li><span class="mk">›</span> Tuning context, specs &amp; standards</li>
+              <li><span class="mk">›</span> Designing &amp; improving your flows</li>
+              <li><span class="mk">›</span> The complex calls that need judgment</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">4</span><p class="bigline" style="text-align:left"><span style="color:#cdd7f5;font-size:14px;font-weight:500">Constantly ask: how do I improve my own output through agents?</span> <span class="accent">If you're working the way you did a year ago, you're already behind.</span></p></div>
+    </section>
+
+    <!-- 8 — OBJECTIONS -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="eyebrow">The hard questions, answered</span>
+        <h1>“But <span class="accent">what about…</span>”</h1>
+        <p class="lede">The doubts are fair. Here they are, said out loud — and answered.</p>
+      </div>
+      <div class="stage">
+        <div class="objs">
+          <div class="obj">
+            <div class="q"><span class="qm">?</span> "Agents write sloppy code — who's accountable when it breaks?"</div>
+            <div class="a"><span class="am">→</span> You are. Accountability doesn't move. The agent is your team; a good EM owns their team's output. Your standards, specs, and review are how you enforce quality.</div>
+          </div>
+          <div class="obj">
+            <div class="q"><span class="qm">?</span> "Won't I just spend all day reviewing bad PRs?"</div>
+            <div class="a"><span class="am">→</span> Only if your context is bad. Better <code>AGENTS.md</code>, specs, and CI gates mean better first drafts. Reviewing is leverage — one review, many PRs — not busywork.</div>
+          </div>
+          <div class="obj">
+            <div class="q"><span class="qm">?</span> "If a cloud agent ships a bug, is that on me?"</div>
+            <div class="a"><span class="am">→</span> Yes — and that's the point. You own the service. The repro-test-first bug flow and the traceability gate exist so the machine catches most of it before you do.</div>
+          </div>
+          <div class="obj">
+            <div class="q"><span class="qm">?</span> "This sounds like more management, less real engineering."</div>
+            <div class="a"><span class="am">→</span> It's more <i>leverage</i>, not more meetings. The engineering moved up: architecture, system design, and directing agents <b>is</b> the real engineering now.</div>
+          </div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">✎</span><p><b>The one line that resolves most of this:</b> accountability never moves. You still own the output — the agents are how you produce more of it, at higher quality, than you could alone.</p></div>
+    </section>
+
+    <!-- 9 — MONDAY MORNING -->
+    <section class="slide">
+      <div class="slide-head">
+        <span class="eyebrow">Monday morning</span>
+        <h1>Where you <span class="accent">start.</span></h1>
+        <p class="lede">Concrete first moves for the service you own.</p>
+      </div>
+      <div class="stage">
+        <div class="steps">
+          <div class="stepc"><span class="sn">1</span><span class="sx"><b>Install the standards kit</b> in your service repo — <code>bin/sync.ps1</code> / <code>sync.sh</code>. Your repo gets its harness, gates, and dispatch flow.</span></div>
+          <div class="stepc"><span class="sn">2</span><span class="sx"><b>Write your <code>AGENTS.md</code> and <code>CONTEXT.md</code></b> — teach your agents your service: its mission, stack, and domain language.</span></div>
+          <div class="stepc"><span class="sn">3</span><span class="sx"><b>Move your bugs &amp; small tickets into Radix Flows</b> — let the toil lane run so your attention goes to the bigger things.</span></div>
+          <div class="stepc"><span class="sn">4</span><span class="sx"><b>Spend one hour improving a single flow</b> — a prompt, a spec, a gate. Then do it again next week. Compounding is the whole game.</span></div>
+        </div>
+      </div>
+      <div class="cap"><span class="cnum">◆</span><p class="bigline" style="text-align:left"><span class="accent">You're not writing less software.</span> <span style="color:#cdd7f5;font-size:14px;font-weight:500">You're building the system that builds it — and owning what it ships.</span></p></div>
+    </section>
+
+  </div>
+
+  <div class="nav">
+    <button class="arrow" id="prev" aria-label="Previous">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="dots" id="dots"></div>
+    <span class="counter" id="counter">1 / 9</span>
+    <button class="arrow" id="next" aria-label="Next">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+  <div class="hint">Use <span class="kbd">←</span> <span class="kbd">→</span> · click <span class="kbd">＋</span> cards for detail</div>
+
+  <!-- ============ MODAL ============ -->
+  <div class="overlay" id="overlay">
+    <div class="modal"><button class="mclose" id="mclose" aria-label="Close">✕</button><div id="mbody"></div></div>
+  </div>
+
+  <!-- ============ MODAL SOURCES ============ -->
+  <div style="display:none">
+
+    <div id="src-tpm">
+      <div class="meyebrow">Pillar 0 · Role one</div>
+      <h2>Technical Product Manager</h2>
+      <p class="msub">Facing <b>up</b> — toward the product team. You stop being an order-taker and start co-owning the product.</p>
+      <h4>What it asks of you</h4>
+      <ul>
+        <li><span class="mk">›</span> Talk to the product team directly — understand the user and the business, don't just consume a ticket.</li>
+        <li><span class="mk">›</span> Treat the Jira ticket as a <b>PRD</b> — the what and why. The technical spec is <i>your</i> deliverable.</li>
+        <li><span class="mk">›</span> Push back, ask the product questions, and shape scope before anything gets built.</li>
+        <li><span class="mk">›</span> Offer more than code: prioritization, trade-offs, and a point of view on where the service should go.</li>
+      </ul>
+      <h4>The mindset to overcome</h4>
+      <p>The "I'm only a programmer, someone else decides the what" reflex. From here, <b>you</b> are one of the people who decides.</p>
+    </div>
+
+    <div id="src-em">
+      <div class="meyebrow">Pillar 0 · Role two</div>
+      <h2>Engineering Manager</h2>
+      <p class="msub">Facing <b>down</b> — toward your agents. They are your team members; you are their lead.</p>
+      <h4>What it asks of you</h4>
+      <ul>
+        <li><span class="mk">›</span> Coordinate the whole effort — break work down, delegate to agents, sequence it.</li>
+        <li><span class="mk">›</span> Give your team what a good manager gives: clear context, clear specs, clear standards.</li>
+        <li><span class="mk">›</span> Review their output critically and own it — their PRs are your PRs.</li>
+        <li><span class="mk">›</span> Invest in making the team better: sharper prompts, better harness, tighter feedback loops.</li>
+      </ul>
+      <h4>The mental model</h4>
+      <p>You wouldn't hand-write everything if you managed five engineers. You'd lead them. <b>Same here — the team just happens to be agents.</b></p>
+    </div>
+
+    <div id="src-own">
+      <div class="meyebrow">Pillar 1 · Ownership</div>
+      <h2>What you own for the period</h2>
+      <p class="msub">For roughly three months, one service is yours. You wear every hat.</p>
+      <h4>The hats</h4>
+      <ul>
+        <li><span class="mk">PM</span> The roadmap and priorities — what gets built and in what order.</li>
+        <li><span class="mk">Arch</span> The architecture — the design decisions, captured as ADRs.</li>
+        <li><span class="mk">Eng</span> The implementation — driven with your agent team, spec-first.</li>
+        <li><span class="mk">QA</span> The quality bar — specs, tests, and the acceptance evidence that proves it works.</li>
+        <li><span class="mk">Ops</span> The outcomes — you own what ships and how it behaves in production.</li>
+      </ul>
+      <h4>Why a whole service, not tickets</h4>
+      <p>Depth compounds. Deep context, consistent decisions, and real momentum only happen when one person owns the whole picture over time — and it's exactly the context your agents need to be effective.</p>
+    </div>
+
+    <div id="src-kit">
+      <div class="meyebrow">Pillar 2 · Standards · agentic-standards-kit v1.7.0</div>
+      <h2>The agentic harness, exactly</h2>
+      <p class="msub">Drop-in and versioned. Apply it to any service repo with <code>bin/sync.ps1</code> / <code>bin/sync.sh</code> and the repo carries its own standards, CI gates, and dispatch workflows.</p>
+      <div class="tree"><span class="fn">agentic-standards-kit/</span>
+├── <span class="fn">AGENTS.md</span>                       <span class="cm">← rules every AI agent reads first (&lt;80 lines)</span>
+├── <span class="fn">CONTEXT.md</span>                      <span class="cm">← domain glossary — how you name things</span>
+├── <span class="dir">docs/</span>
+│   ├── <span class="dir">adr/</span>                        <span class="cm">← 0001 methodology · 0002 verification · 0003 autonomy tiers</span>
+│   ├── <span class="fn">agentic-dispatch.md</span>         <span class="cm">← the dispatch flow + per-repo prereqs</span>
+│   ├── <span class="fn">agent-ready-checklist.md</span>    <span class="cm">← repo readiness audit</span>
+│   └── <span class="fn">metrics.md</span>                  <span class="cm">← KPIs + autonomy promotion bar</span>
+├── <span class="dir">specs/</span><span class="fn">_template/spec.md</span>          <span class="cm">← EARS criteria with stable AC IDs</span>
+├── <span class="dir">.claude/</span>                        <span class="cm">← Claude Code hooks + /sync-jira skill</span>
+├── <span class="dir">.cursor/</span>                        <span class="cm">← Cursor hooks, Atlassian MCP, cloud-agent env</span>
+├── <span class="dir">.github/workflows/</span>
+│   ├── <span class="fn">dispatch-agent.yml</span>          <span class="cm">← receives the Jira dispatch</span>
+│   ├── <span class="fn">implement-on-spec-merge.yml</span> <span class="cm">← spec PR merge → implementation agent</span>
+│   ├── <span class="fn">spec-traceability.yml</span>       <span class="cm">← deterministic definition-of-done gate</span>
+│   └── <span class="fn">label-prs.yml</span>               <span class="cm">← fact-derived auto-labels (spec / impl)</span>
+└── <span class="fn">bin/sync.ps1 · bin/sync.sh</span>       <span class="cm">← apply / update the kit in a repo</span></div>
+      <h4>The four you touch most</h4>
+      <ul>
+        <li><span class="mk">AGENTS.md</span> How to work a ticket: Story → EARS spec first; Bug → failing repro test named with the key; Task → trivial path or ADR. Spec merges are the human approval gate.</li>
+        <li><span class="mk">CONTEXT.md</span> The glossary agents read before naming anything. Missing a term? Add it before you continue.</li>
+        <li><span class="mk">docs/adr/</span> Architecture Decision Records — the durable <i>why</i> behind every big call.</li>
+        <li><span class="mk">specs/</span> EARS acceptance criteria with stable AC IDs; tests reference the IDs verbatim, and the traceability gate enforces coverage.</li>
+      </ul>
+    </div>
+
+    <div id="src-toil">
+      <div class="meyebrow">Pillar 3 · Automation · Toil lane</div>
+      <h2>The toil lane — automated</h2>
+      <p class="msub">Bugs and small, well-scoped tickets flow to cloud agents so you don't spend your day on them.</p>
+      <h4>How it flows</h4>
+      <ul>
+        <li><span class="mk">1</span> A bug or small ticket lands and is managed in <b>Radix Flows</b> — your ticket-flow hub.</li>
+        <li><span class="mk">2</span> It's dispatched to a <b>cloud agent</b> (Dispatch Agent → <code>repository_dispatch</code> → Cursor cloud agent).</li>
+        <li><span class="mk">3</span> The agent works it — for bugs, a failing repro test named with the key comes first, then the fix — and opens a PR.</li>
+        <li><span class="mk">4</span> <b>You review and merge.</b> CI and the traceability gate have already run.</li>
+      </ul>
+      <h4>Why</h4>
+      <p>Two reasons: <b>reduce developer toil</b>, and <b>keep your attention on the bigger things</b> — not the small, repetitive fixes. <span class="mat pilot" style="margin-left:2px">Piloting</span> on a few repos today, rolling out to the rest.</p>
+    </div>
+
+    <div id="src-complex">
+      <div class="meyebrow">Pillar 3 · Automation · Complex lane</div>
+      <h2>The complex lane — you + agents</h2>
+      <p class="msub">The work that needs judgment stays with you. Agents amplify you; they don't replace the decision.</p>
+      <h4>How it flows</h4>
+      <ul>
+        <li><span class="mk">1</span> A hard problem — new capability, cross-cutting change, real trade-offs.</li>
+        <li><span class="mk">2</span> <b>Spec first.</b> You make the calls and write (or direct) an EARS spec. Merging the spec PR is the approval gate.</li>
+        <li><span class="mk">3</span> You build <b>with</b> your agents — the spec-merge auto-dispatches implementation on pilot repos; you steer and review.</li>
+        <li><span class="mk">4</span> <b>You own the outcome.</b> This is where your engineering judgment earns its keep.</li>
+      </ul>
+      <h4>The split, in one line</h4>
+      <p>Automate the decided; own the deciding. The more of the toil lane you set up well, the more time you have for this one.</p>
+    </div>
+
+  </div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const counter = document.getElementById('counter');
+  const dotsWrap = document.getElementById('dots');
+  let i = 0;
+
+  slides.forEach((_, n) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (n === 0 ? ' on' : '');
+    d.addEventListener('click', () => go(n));
+    dotsWrap.appendChild(d);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function go(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    dots.forEach((d, k) => d.classList.toggle('on', k === i));
+    counter.textContent = (i + 1) + ' / ' + slides.length;
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+  }
+  prev.addEventListener('click', () => go(i - 1));
+  next.addEventListener('click', () => go(i + 1));
+
+  /* ---- modal ---- */
+  const overlay = document.getElementById('overlay');
+  const mbody = document.getElementById('mbody');
+  const mclose = document.getElementById('mclose');
+  let modalOpen = false;
+
+  function openModal(key){
+    const src = document.getElementById('src-' + key);
+    if(!src) return;
+    mbody.innerHTML = src.innerHTML;
+    overlay.classList.add('on');
+    modalOpen = true;
+  }
+  function closeModal(){ overlay.classList.remove('on'); modalOpen = false; }
+
+  document.querySelectorAll('[data-modal]').forEach(el => {
+    el.addEventListener('click', () => openModal(el.getAttribute('data-modal')));
+  });
+  mclose.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => { if(e.target === overlay) closeModal(); });
+
+  document.addEventListener('keydown', (e) => {
+    if(modalOpen){ if(e.key === 'Escape') closeModal(); return; }
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); go(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(slides.length - 1);
+  });
+  go(0);
+</script>
+</body>
+</html>
